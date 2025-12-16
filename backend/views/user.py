@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify, request
-from models import db, User
+from backend.models import db, User
 
 user_bp = Blueprint('api', __name__, url_prefix='/api')
 
 @user_bp.route("/users", methods=["GET"])
 def get_users():
+
     users = User.query.all()
     return jsonify([user.to_dict() for user in users])
 

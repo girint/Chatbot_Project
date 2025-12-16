@@ -2,7 +2,6 @@ import './App.css'
 import React, { useEffect, useState } from 'react';
 import { Test_api, User_api, createUser } from './api/User_Api';  //api 불러온거 사용하기 위한 코드
 import { TestView, UserListView, UserFormView } from './components/UserView';
-import axios from 'axios';
 import Header from './components/common/Header.jsx'
 
 

@@ -16,7 +16,7 @@
   },
   "scripts": {
     "start": "concurrently \"npm run start:backend\" \"react-scripts start\"",
-    "start:backend": "cd ../backend && python app.py",
+    "start:backend": "cd .. && python -m backend.app",
     "start:dev": "concurrently \"npm run start:backend\" \"react-scripts start\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
