@@ -20,7 +20,7 @@ function App() {
     const [test, setTest] = useState('');
         useEffect(() => {
         const loadTest = async () => {
-            const data = await Test_api(); // 비동기 호출
+            const data = await Test_api(); // 비동기  호출
             setTest(data.msg);            // 끝나면 state 업데이트 → 재렌더
         };
         loadTest();
