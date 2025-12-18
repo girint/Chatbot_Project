@@ -4,7 +4,7 @@ import { Route, Routes } from 'react-router-dom';
 
 import React, { useEffect, useState } from 'react';
 import { Test_api } from './api/User_Api';  //api 불러온거 사용하기 위한 코드 테스트용
-import { TestView} from './components/UserView';
+import TestView from './components/UserView';
 
 import Header from './components/common/Header.jsx'
 import Footer from './components/common/Footer.jsx'
@@ -13,6 +13,7 @@ import Login from './components/userbasic/Login.jsx'
 import Signup from './components/userbasic/Signup.jsx'
 import Mypage from './components/userbasic/Mypage.jsx'
 import Pay from './components/userbasic/Pay.jsx'
+import Detail from './components/Detail.jsx'
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
             <Route path="/Signup" element={<Signup />} />
             <Route path="/Mypage" element={<Mypage />} />
             <Route path="/Pay" element={<Pay />} />
+            <Route path='/Detail' element={<Detail />} />
         </Routes>   
         <Footer/>      
         

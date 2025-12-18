@@ -48,3 +48,5 @@ export function UserFormView({ name, email, onChangeName, onChangeEmail, onSubmi
     </section>
   );
 }
+
+export default TestView;
