@@ -36,7 +36,7 @@ export default function Login() {
 
         localStorage.setItem("userSession", JSON.stringify(userSession));
         console.log("✅ localStorage 저장 완료"); // 저장 완료 나중에 삭제할꺼임
-        navigate("/");
+        navigate("/ ");
       } else {
           console.error("❌ 로그인 실패:", data.message);
           setError(data.message);
