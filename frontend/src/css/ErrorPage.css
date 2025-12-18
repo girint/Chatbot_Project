@@ -1,0 +1,7 @@
+.ErrorPage_all {width: 1200px; height: 800px; background-color: #E5DAFF; display: flex;}
+.ErrorPage_Col {display: flex; justify-content: center; margin-top: 100px;}
+.ErrorPage_banner {width: 65%;}
+
+.button_all {margin-top: 100px; display: flex; justify-content: center;}
+.button {border: 2px solid #3C407F; width: 100px; height: 35px; display: flex; border-radius: 8px; align-items: center; justify-content: center; background-color: white;}
+.button:hover {background-color: #3C407F; color: white; cursor: pointer;}

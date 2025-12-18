@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../api/User_Api"; // 로그인 API
+import { Col, Form, Row } from 'react-bootstrap';
 
 export default function Login() {
   const [email, setemail] = useState("");
@@ -36,6 +37,11 @@ export default function Login() {
 
         localStorage.setItem("userSession", JSON.stringify(userSession));
         console.log("✅ localStorage 저장 완료"); // 저장 완료 나중에 삭제할꺼임
+
+        //추가
+        localStorage.setItem('token', 'logged-in'); //token 키 저장
+        window.dispatchEvent(new Event("auth-change"));
+
         navigate("/");
       } else {
           console.error("❌ 로그인 실패:", data.message);
@@ -60,12 +66,37 @@ export default function Login() {
           <img src="/img/Login_logo.png" alt="avatar" />
         </div>
 
-        <form onSubmit={ onSubmit } className="login-form">
-          <label className="login-label">이메일</label>
-          <input className="login-input" type="email" value={ email } onChange={(e) => setemail(e.target.value)} placeholder="" disabled={loading} autoComplete="email"/>
+        <Form onSubmit={onSubmit} className="login-form">
 
-          <label className="login-label">비밀번호</label>
-          <input className="login-input" type="password" value={ password } onChange={(e) => setPassword(e.target.value)} placeholder="" disabled={loading} autoComplete="current-password" />
+          <Form.Group className="mb-3">
+            <Form.Label className="login-label">
+              이메일
+            </Form.Label>
+
+            <Form.Control
+              className="login-input"
+              type="email"
+              value={email}
+              onChange={(e) => setemail(e.target.value)}
+              disabled={loading}
+              autoComplete="email"
+            />
+          </Form.Group>
+          
+          <Form.Group className="mb-3">
+            <Form.Label className="login-label">
+              비밀번호
+            </Form.Label>
+
+            <Form.Control
+              className="login-input"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
+              autoComplete="current-password"
+            />
+          </Form.Group>
 
            {/*에러메세지 출력 란*/}
            {error && (<div className="error-message" style={{ color: "red", fontSize: "14px", margin: "10px 0" }}> {error} </div> )}
@@ -86,7 +117,7 @@ export default function Login() {
             <button type="button" className="social K">K</button>
             <button type="button" className="social G">G</button>
           </div>
-        </form>
+        </Form>
       </div>
     </div>
   )

@@ -14,7 +14,11 @@ import Signup from './components/userbasic/Signup.jsx'
 import Mypage from './components/userbasic/Mypage.jsx'
 import Pay from './components/userbasic/Pay.jsx'
 import Detail from './components/Detail.jsx'
+import ErrorPage from "./components/common/ErrorPage.jsx"
 
+/* 자동 스크롤 import */
+import BackToTop from "./components/common/BackToTop.jsx";
+import { Outlet } from "react-router-dom"
 
 function App() {
     const [test, setTest] = useState('');
@@ -36,10 +40,12 @@ function App() {
             <Route path="/Mypage" element={<Mypage />} />
             <Route path="/Pay" element={<Pay />} />
             <Route path='/Detail' element={<Detail />} />
+            <Route path='/ErrorPage' element={<ErrorPage />} />
         </Routes>   
+        <Outlet />
+        <BackToTop />
         <Footer/>      
         
-        <TestView test={test} />
         </>
         )
 }
