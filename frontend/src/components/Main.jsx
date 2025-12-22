@@ -1,12 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { MainSummary } from "../api/Main_Api";
 import { Container, Row, Col, Image } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const AIIntroduce = () => {
     const [noticeData, setNoticeData] = useState([]);
-    const [Loading,setLoading] = useState(true);
+    const [Loading, setLoading] = useState(true);
     const navigate = useNavigate();
+
+    // StrictMode에서 useEffext 2번 실행 방지용
+    const fetchedRef = useRef(false);
+
+    // 페이지네이션 상태 설정
+    const [page, setPage] = useState(1);
+    const pageSize = 5;   //한 페이지에 보여줄 게시글 수
+
+    // 모바일 감지 (480ox 기준)
+    const [isMobile, setIsMobile] = useState(() =>
+        typeof window !== "undefined" ? window.innerWidth <= 480 : false);
+
+    // resize 이벤트로 모바일 여부 갱신
+    useEffect(() => {
+        const onResize = () => setIsMobile(window.innerWidth <= 480);
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+    }, []);
 
     // API 데이터 불러오기
     useEffect(() => {
@@ -18,7 +36,7 @@ const AIIntroduce = () => {
                 const data = await MainSummary();  //API 호출
                 console.log("✅ 메인 데이터 불러오기 성공!", data);  //성공 로그 후에 삭제 가능
 
-                if (data && data.success) {
+                if (data && data.success && Array.isArray(data.notice)) {
                     // Notice 데이터 매핑 (API 필드 → 기존 구조 맞춤)
                     const mappedNoticeData = data.notice.map((item) => ({
                         id: item.notice_id,
@@ -41,7 +59,56 @@ const AIIntroduce = () => {
         };
 
         noticeData();
-    }, [Loading]);
+    }, []);
+
+    // 총 페이지 수
+    const totalPages = useMemo(() => {
+        return Math.max(1, Math.ceil(noticeData.length / pageSize));
+    }, [noticeData.length, pageSize]);
+
+    // 현재 페이지가 범위를 벗어나면 보정
+    useEffect(() => {
+        if (page > totalPages) setPage(totalPages);
+        if (page < 1) setPage(1);
+    }, [page, totalPages]);
+
+    // 현재 페이지에 보여줄 데이터만 slice
+    const pagedNoticeData = useMemo(() => {
+        const start = (page - 1) * pageSize;
+        return noticeData.slice(start, start + pageSize);
+    }, [noticeData, page, pageSize]);
+
+    // 페이지 버튼 개수 (pc 5 / 모바일 3)
+    const visibleCount = isMobile ? 3 : 5;
+
+    // 페이지 번호 범위 계산 (6페이지는 6~10 느낌)
+    const { startPage, endPage } = useMemo(() => {
+        let start = page - Math.floor(visibleCount / 2);
+        let end = start + visibleCount - 1;
+
+        if (start < 1) {
+            start = 1;
+            end = Math.min(totalPages, start + visibleCount - 1);
+        }
+        if (end > totalPages) {
+            end = totalPages;
+            start = Math.max(1, end - visibleCount + 1);
+        }
+        return { startPage: start, endPage: end };
+    }, [page, totalPages, visibleCount]);
+
+    // 페이지 번호 배열
+    const pageNumbers = useMemo(() => {
+        const arr = [];
+        for (let p = startPage; p <= endPage; p++) arr.push(p);
+        return arr;
+    }, [startPage, endPage]);
+
+    // 이동 함수
+    const goPage = (p) => setPage(p);
+
+    // 페이지 slice랑 분리
+    const isEmpty = !Loading && noticeData.length === 0;
 
 
     return (
@@ -175,21 +242,42 @@ const AIIntroduce = () => {
                         <span>조회수</span>
                     </div>
 
-                    {noticeData.map((item) => (
-                        <div className="notice-row" key={item.id}  onClick={() => navigate(`/notice/${item.id}`)}>
-                            <span>{item.id}</span>
-                            <span className="title">{item.title}</span>
-                            <span>{item.writer}</span>
-                            <span>{item.views}</span>
+                    {pagedNoticeData.length > 0 ? (
+                        pagedNoticeData.map((item) => (
+                            <div
+                                className="notice-row"
+                                key={item.id}
+                                onClick={() => navigate(`/notice/${item.id}`)}
+                            >
+                                <span>{item.id}</span>
+                                <span className="title">{item.title}</span>
+                                <span>{item.writer}</span>
+                                <span>{item.views}</span>
+                            </div>
+                        ))
+                    ) : !Loading ? (
+                        <div style={{ padding: 16, textAlign: "center" }}>
+                            게시글이 없습니다.
                         </div>
-                    ))}
+                    ) : null}
                 </div>
 
-                <div className='pagination_all'>
+                {/* 페이지네이션 */}
+                <div className="pagination_all">
                     <div className="pagination">
-                        <p>1 2 3 4 ...</p>
+                        {/* ◀ */}
+                        <button className="page-arrow" onClick={() => goPage(page - 1)} disabled={page === 1} aria-label="이전 페이지">◀</button>
+
+                        {/* 숫자 버튼 */}
+                        {pageNumbers.map((p) => (
+                            <button key={p} className={`page-num ${page === p ? "active" : ""}`} onClick={() => goPage(p)} aria-current={page === p ? "page" : undefined}>{p}</button>
+                        ))}
+
+                        {/* ▶ */}
+                        <button className="page-arrow" onClick={() => goPage(page + 1)} disabled={page === totalPages} aria-label="다음 페이지">▶</button>
                     </div>
                 </div>
+
             </div>
         </section>
     );
