@@ -151,6 +151,28 @@ html {overflow-y: scroll;}
 /* ----------------------------------------------------- */
 /* Footer */
 /* ----------------------------------------------------- */
-.Footer_navBar {padding-top: 0; padding-bottom: 0;}
+.customer-service {display: flex; font-size: 13px; justify-content: center; align-items: center; }
+.customer-service-box {width: 1200px; display: flex; justify-content: space-around; border-top: 2px solid #44444443; padding-top: 30px;}
+
+.customer-service_left h5 {padding-bottom: 10px; font-size: 15px; font-weight: 550;}
+ .customer-service_left-p {font-size: 14px; font-weight: 550; margin-bottom: 25px;}
+.customer-service_left p b {font-size: 19px; padding: 0 7px 10px 0; }
+.customer-service-div-1 div {font-size: 12px ; width: 110px; height: 36px; margin: 0 15px 0 0; display: flex; justify-content: center; align-items: center; border: 1px solid #4444442f;}
+.customer-service-div-1 p {font-size: 11px; color: #444444ab;}
 
 
+.customer-service_right_list p {padding-right: 10px; font-weight: 600;}
+.customer-service_right_bootom {margin-top: 10px; font-size: 11px; color: #444444ab;}
+.customer-service_right_bootom span {color: #0000d4;}
+.customer-service_right_bootom span:first-child {padding-left: 5px;}
+.customer-service_right_bottom_img {padding-top: 40px;}
+.customer-service_right_bottom_img img {width: 30px; border-radius: 100%; margin-right: 15px;}
+
+.customer-service_bottom-all {display: flex; justify-content: center; align-items: center;}
+.customer-service_bottom_1 {display: flex; justify-content: space-around; margin-top: 30px; padding-bottom: 20px;}
+.customer-service_bottom_1_box {width: 1200px; border-top: 1px solid #4444442d;}
+.customer-service_bottom_1_left, .customer-service_bottom_1_right {display: flex; margin-top: 20px; align-items: center; font-size: 11px; color: #444444ab;}
+.customer-service_bottom_1_right {padding-left: 150px;}
+.customer-service_bottom_1_left img, .customer-service_bottom_1_right img {width: 50px; opacity: 50%; margin-right: 15px;}
+
+.customer-service_bottom_2 {border-top: 2px solid #44444443; display: flex; justify-content: center; align-items: center; padding: 13px; font-size: 14px;}
