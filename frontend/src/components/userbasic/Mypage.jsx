@@ -81,7 +81,7 @@ const Mypage = () => {
       const result = await delete_user();
 
       if (result.success) {
-        TokenManager.logout();
+        TokenManager.clear();
         alert('회원탈퇴가 완료되었습니다! 🙏');
         navigate('/');
       }

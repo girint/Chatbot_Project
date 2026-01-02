@@ -95,12 +95,11 @@ def get_user_profile(user):
 
 @mypage_bp.route('/users/delete', methods=['DELETE'])
 @token_required
-def delete_user():
+def delete_user(user):
     try:
-        auth_header = request.headers.get("Authorization")
-        raw_token = auth_header.replace("Bearer ", "")
-        nickname_token = unquote(raw_token)
-        user = User.query.filter_by(user_nickname=nickname_token, user_delete=False).first()
+        if user.user_delete:
+            return jsonify({'success': False, 'error': '이미 탈퇴한 계정입니다.'}), 400
+
         #익명화 + Soft Delete!
         user.user_nickname = f"s{user.user_id}"  # s+id
         user.user_email = f"s{user.user_id}@deleted.com"

@@ -2,11 +2,12 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "../../css/Notice.css";
 import { fetchNoticeDetail, likeNotice, createComment, deleteNotice, deleteComment } from "../../api/Notice_Api";
-import { AuthUtils } from '../../api/User_Api';
+import { AuthUtils,TokenManager } from '../../api/User_Api';
 
 export default function NoticeDetail() {
   const { noticeId } = useParams();
   const navigate = useNavigate();
+
 
   // 상태 통합
   const [state, setState] = useState({
@@ -18,6 +19,12 @@ export default function NoticeDetail() {
     commentLoading: false,
     error: null
   });
+
+  const isOwner = TokenManager.getNickname() === state.noticeData?.author_name;
+  useEffect(() => {
+      console.log('🔍 현재 닉네임:', TokenManager.getNickname());
+      console.log('📋 게시글 데이터:', state.noticeData);
+    }, [state.noticeData]);
 
   // 데이터 로드
   useEffect(() => {
@@ -175,12 +182,14 @@ export default function NoticeDetail() {
               다음글 →
             </button>
           </div>
+          {isOwner && (
           <div className="nd-actions">
             <button className="nd-actionBtn nd-edit" onClick={() => navigate(`/notice/edit/${state.noticeData.notice_id}`)}>
               수정
             </button>
             <button className="nd-actionBtn nd-del" onClick={onClickDelete}>삭제</button>
-          </div>
+
+          </div>)}
         </div>
 
         <div className="nd-divider" />

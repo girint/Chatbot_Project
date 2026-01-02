@@ -46,14 +46,37 @@ export async function getMyProfile() {
   return res.data;
 }
 
-//회원탈퇴 API
-export const delete_user = async () => {
-  const token = TokenManager.getToken();
+////회원탈퇴 API
+//export const delete_user = async () => {
+//  const token = TokenManager.getToken();
+//
+//  const response = await fetch(`users/delete`, {
+//    method: 'DELETE',
+//    headers: {
+//      'Authorization': `Bearer ${token}`,
+//      'Content-Type': 'application/json'
+//    }
+//  });
+//
+//  if (!response.ok) {
+//    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+//  }
+//
+//  return await response.json();
+//};
 
-  const response = await fetch(`users/delete`, {
+// Mypage_Api.js
+export const delete_user = async () => {
+  const token = TokenManager.getNickname();  // 👈 닉네임 = 토큰!
+
+  if (!token) {
+    throw new Error('로그인 토큰이 없습니다.');
+  }
+
+  const response = await fetch(`http://localhost:5000/api/users/delete`, {  // 👈 풀 URL!
     method: 'DELETE',
     headers: {
-      'Authorization': `Bearer ${token}`,
+      'Authorization': `Bearer ${encodeURIComponent(token)}`,  // 👈 User_Api와 동일!
       'Content-Type': 'application/json'
     }
   });
