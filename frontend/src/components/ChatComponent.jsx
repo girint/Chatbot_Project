@@ -82,6 +82,17 @@ const ChatComponent = () => {
                     // [정석 로직] 서버가 주는 intro_html을 가공 없이 그대로 노출합니다.
                     // 이름 불일치 문제는 이제 백엔드 파이썬 코드에서 수정하게 됩니다.
                     setIntro(data.intro_html);
+
+                    // --- [신규 추가 기능] 기존 대화 내역(history) 로드 ---
+                    // 기존 코드를 삭제하지 않고 history 데이터가 있을 경우에만 추가 기능을 수행합니다.
+                    if (data.history && Array.isArray(data.history)) {
+                        const loadedHistory = [];
+                        data.history.forEach(item => {
+                            loadedHistory.push({ role: 'user', text: item.question });
+                            loadedHistory.push({ role: 'ai', text: item.answer });
+                        });
+                        setChat(loadedHistory);
+                    }
                 }
             } catch (err) {
                 console.error(`${type} 데이터 로드 실패:`, err);

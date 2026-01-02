@@ -7,6 +7,22 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from backend.models import db, ChatLog, UseBox  # UseBox 모델 임포트 추가
 from datetime import datetime, timezone
+# --- [신규 추가] database.py의 함수 임포트 ---
+try:
+    # 1. 최상위(Chatbot_Project) 폴더 기준 경로
+    from backend.models import db, ChatLog, UseBox
+    from backend.database import save_chat_to_mongo, get_chat_from_mongo
+except ImportError:
+    # 2. backend 폴더가 소스 루트이거나 경로가 꼬였을 때 (이곳이 실행되면 밑줄이 사라집니다)
+    try:
+        from models import db, ChatLog, UseBox
+        from database import save_chat_to_mongo, get_chat_from_mongo
+    except ImportError:
+        # 3. 최후의 수단: 절대 경로 추가 (필요시)
+        import sys
+        sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../..")
+        from backend.models import db, ChatLog, UseBox
+        from backend.views.database import save_chat_to_mongo, get_chat_from_mongo
 
 load_dotenv()
 
@@ -45,7 +61,7 @@ SYSTEM_PROMPT = """
 7. 면책 조항: 답변의 마지막에 "⭐ 중요: 모든 투자에는 위험이 따르며, 챗봇의 정보는 참고용일 뿐입니다. 최종 투자 결정은 반드시 사용자 본인의 신중한 판단과 책임 하에 이루어져야 합니다."라는 면책 조항을 포함합니다.
 """
 
-# OpenAI 클라이언트 초기화
+# OpenAI 클라이언트 초기화 (기존 유지)
 client = None
 try:
     api_key = os.environ.get("OPENAI_API_KEY")
@@ -63,6 +79,12 @@ except Exception as e:
 def chat_usage():
     user_name = session.get('user_name', USER_NAME)
     user_id = session.get('user_id')
+
+    # [수정 부분] 기존 금융 상담 내역이 있는지 확인하여 가져옴
+    history = []
+    if user_id:
+        # 카테고리를 'finance'로 지정하여 MongoDB 기록 조회
+        history = get_chat_from_mongo(user_id, "finance")
 
     # 기존 금융 안내 문구 유지
     chat_intro_html = f"""
@@ -92,7 +114,8 @@ def chat_usage():
         "user_name": user_name,
         "is_logged_in": bool(user_id),
         "chat_title": CHAT_TITLE,
-        "intro_html": chat_intro_html
+        "intro_html": chat_intro_html,
+        "history": history  # [신규 추가] 기존 대화 내역 전달
     })
 
 
@@ -148,7 +171,7 @@ def ask():
             db.session.commit()
             sql_id = new_log.id
 
-            # 3. MongoDB 저장 (Atlas)
+            # 3. MongoDB 저장 (Atlas) - 기존 코드 유지
             mongodb = getattr(current_app, 'mongodb', None)
             if mongodb is not None:
                 try:
@@ -165,7 +188,10 @@ def ask():
                 except Exception as mongo_err:
                     print(f"[Finance Mongo Error] {mongo_err}")
 
-            # 4. Vector DB 저장
+            # [신규 추가] 히스토리 유지를 위한 MongoDB 공통 함수 호출
+            save_chat_to_mongo(current_user_id, "finance", user_message, ai_response)
+
+            # 4. Vector DB 저장 (기존 유지)
             vector_db = getattr(current_app, 'vector_db', None)
             if vector_db is not None:
                 try:
@@ -188,7 +214,7 @@ def ask():
         return jsonify({'response': '서버 통신 오류가 발생했습니다.'}), 500
 
 
-# --- 3. 리포트 생성 함수 (/finance/report) ---
+# --- 3. 리포트 생성 함수 (/finance/report) --- (기존 유지)
 @bp.route('/report', methods=['GET'])
 def generate_report():
     user_id = session.get('user_id', 1)

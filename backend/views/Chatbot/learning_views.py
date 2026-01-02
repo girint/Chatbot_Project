@@ -7,6 +7,8 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from backend.models import db, ChatLog, UseBox  # UseBox 모델 임포트 추가
 from datetime import datetime, timezone
+# --- [신규 추가] database.py의 함수 임포트 ---
+from backend.views.database import save_chat_to_mongo, get_chat_from_mongo
 
 load_dotenv()
 
@@ -45,7 +47,7 @@ SYSTEM_PROMPT = """
 7. 면책 조항: 답변의 마지막에 "⭐ 중요: 이 챗봇은 학습 정보와 전략을 제공하지만, 개인의 시험 합격이나 특정 학습 결과를 보장하지 않습니다. 제공된 정보를 바탕으로 꾸준히 노력하는 것이 중요합니다."라는 면책 조항을 포함합니다.
 """
 
-# OpenAI 클라이언트 초기화
+# OpenAI 클라이언트 초기화 (기존 유지)
 client = None
 try:
     api_key = os.environ.get("OPENAI_API_KEY")
@@ -63,6 +65,12 @@ except Exception as e:
 def chat_usage():
     user_name = session.get('user_name', USER_NAME)
     user_id = session.get('user_id')
+
+    # [수정 부분] 기존 학습 상담 내역이 있는지 확인하여 가져옴
+    history = []
+    if user_id:
+        # 카테고리를 'learning'으로 지정하여 MongoDB 기록 조회
+        history = get_chat_from_mongo(user_id, "learning")
 
     # 기존 학습 안내 문구 유지
     chat_intro_html = f"""
@@ -92,7 +100,8 @@ def chat_usage():
         "user_name": user_name,
         "is_logged_in": bool(user_id),
         "chat_title": CHAT_TITLE,
-        "intro_html": chat_intro_html
+        "intro_html": chat_intro_html,
+        "history": history  # [신규 추가] 기존 대화 내역 전달
     })
 
 
@@ -148,7 +157,7 @@ def ask():
             db.session.commit()
             sql_id = new_log.id
 
-            # 3. MongoDB 저장 (Atlas)
+            # 3. 기존 MongoDB 저장 (Atlas) - 기존 코드 유지
             mongodb = getattr(current_app, 'mongodb', None)
             if mongodb is not None:
                 try:
@@ -165,7 +174,10 @@ def ask():
                 except Exception as mongo_err:
                     print(f"[Learning Mongo Error] {mongo_err}")
 
-            # 4. Vector DB 저장
+            # [신규 추가] 히스토리 유지를 위한 MongoDB 공통 함수 호출
+            save_chat_to_mongo(current_user_id, "learning", user_message, ai_response)
+
+            # 4. Vector DB 저장 (기존 유지)
             vector_db = getattr(current_app, 'vector_db', None)
             if vector_db is not None:
                 try:
@@ -188,7 +200,7 @@ def ask():
         return jsonify({'response': '서버 통신 오류가 발생했습니다.'}), 500
 
 
-# --- 3. 리포트 생성 함수 (/learning/report) ---
+# --- 3. 리포트 생성 함수 (/learning/report) --- (기존 유지)
 @bp.route('/report', methods=['GET'])
 def generate_report():
     user_id = session.get('user_id', 1)

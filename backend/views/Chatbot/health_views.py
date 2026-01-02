@@ -7,6 +7,8 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from backend.models import db, ChatLog, UseBox  # UseBox 모델 임포트 추가
 from datetime import datetime, timezone
+# --- [신규 추가] database.py의 함수 임포트 ---
+from backend.views.database import save_chat_to_mongo, get_chat_from_mongo
 
 load_dotenv()
 
@@ -45,7 +47,7 @@ SYSTEM_PROMPT = """
 3. 면책 조항: 답변의 마지막에 "⭐ 중요: 저는 AI 건강 코치이며, 의학적 진단이나 처방을 할 수 없습니다. 질병 치료나 심각한 건강 문제는 반드시 전문 의료진과 상담하세요."라는 면책 조항을 포함합니다.
 """
 
-# OpenAI 클라이언트 초기화
+# OpenAI 클라이언트 초기화 (기존 유지)
 client = None
 try:
     api_key = os.environ.get("OPENAI_API_KEY")
@@ -63,6 +65,12 @@ except Exception as e:
 def chat_usage():
     user_name = session.get('user_name', USER_NAME)
     user_id = session.get('user_id')
+
+    # [수정 부분] 기존 건강 상담 내역이 있는지 확인하여 가져옴
+    history = []
+    if user_id:
+        # 카테고리를 'health'로 지정하여 MongoDB 기록 조회
+        history = get_chat_from_mongo(user_id, "health")
 
     # 기존 건강 안내 문구 유지
     chat_intro_html = f"""
@@ -92,7 +100,8 @@ def chat_usage():
         "user_name": user_name,
         "is_logged_in": bool(user_id),
         "chat_title": CHAT_TITLE,
-        "intro_html": chat_intro_html
+        "intro_html": chat_intro_html,
+        "history": history  # [신규 추가] 기존 대화 내역 전달
     })
 
 
@@ -148,7 +157,7 @@ def ask():
             db.session.commit()
             sql_id = new_log.id
 
-            # 3. MongoDB 저장 (Atlas)
+            # 3. MongoDB 저장 (Atlas) - 기존 코드 유지
             mongodb = getattr(current_app, 'mongodb', None)
             if mongodb is not None:
                 try:
@@ -165,7 +174,10 @@ def ask():
                 except Exception as mongo_err:
                     print(f"[Health Mongo Error] {mongo_err}")
 
-            # 4. Vector DB 저장
+            # [신규 추가] 히스토리 유지를 위한 MongoDB 공통 함수 호출
+            save_chat_to_mongo(current_user_id, "health", user_message, ai_response)
+
+            # 4. Vector DB 저장 (기존 유지)
             vector_db = getattr(current_app, 'vector_db', None)
             if vector_db is not None:
                 try:
@@ -190,7 +202,7 @@ def ask():
         return jsonify({'response': '서버 통신 오류가 발생했습니다.'}), 500
 
 
-# --- 3. 리포트 생성 함수 (/health/report) ---
+# --- 3. 리포트 생성 함수 (/health/report) --- (기존 유지)
 @bp.route('/report', methods=['GET'])
 def generate_report():
     user_id = session.get('user_id', 1)
@@ -222,8 +234,7 @@ def generate_report():
         print(f"[Health Report Error] {e}")
         return jsonify({'error': '리포트 생성 중 오류가 발생했습니다.'}), 500
 
-
-# [테스트용] 벡터 DB 저장 내용 확인 API
+# [테스트용] 벡터 DB 저장 내용 확인 API (기존 유지)
 @bp.route('/debug/vector')
 def debug_vector():
     vdb = getattr(current_app, 'vector_db', None)

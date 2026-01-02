@@ -7,6 +7,8 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from backend.models import db, ChatLog, UseBox  # UseBox 모델 임포트 추가
 from datetime import datetime, timezone
+# --- [신규 추가] database.py의 함수 임포트 ---
+from backend.views.database import save_chat_to_mongo, get_chat_from_mongo
 
 # 환경 변수 로드
 load_dotenv()
@@ -65,6 +67,12 @@ def chat_usage():
     user_name = session.get('user_name', USER_NAME)
     user_id = session.get('user_id')
 
+    # [수정 부분] 기존 기술 상담 내역이 있는지 확인하여 가져옴
+    history = []
+    if user_id:
+        # 카테고리를 'tech'로 지정하여 MongoDB 기록 조회
+        history = get_chat_from_mongo(user_id, "tech")
+
     # 사용자가 요청한 상세 안내 문구 (불렛 포인트 포함) 완벽 복구
     intro_html = f"""
     <div class="initial-text" style="margin-top: 5px;">
@@ -91,7 +99,8 @@ def chat_usage():
         "user_name": user_name,
         "is_logged_in": bool(user_id),
         "chat_title": CHAT_TITLE,
-        "intro_html": intro_html
+        "intro_html": intro_html,
+        "history": history  # [신규 추가] 기존 대화 내역 전달
     })
 
 
@@ -102,6 +111,7 @@ def ask():
         return jsonify({'response': 'Error: OpenAI API Key missing.'}), 500
 
     current_user_id = session.get('user_id', 1)
+    user_name = session.get('user_name', USER_NAME)
 
     try:
         data = request.get_json()
@@ -111,7 +121,7 @@ def ask():
             return jsonify({'response': '메시지를 입력해주세요.'}), 400
 
         messages = [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": SYSTEM_PROMPT.format(user_name=user_name)},
             {"role": "user", "content": user_message}
         ]
 
@@ -146,7 +156,7 @@ def ask():
             db.session.commit()
             sql_id = new_log.id
 
-            # 3. MongoDB 저장 (Atlas)
+            # 3. MongoDB 저장 (기본 내역)
             mongodb = getattr(current_app, 'mongodb', None)
             if mongodb is not None:
                 try:
@@ -162,6 +172,9 @@ def ask():
                     print(">>> [SUCCESS] Tech data saved to MongoDB Atlas!")
                 except Exception as mongo_err:
                     print(f"[Tech Mongo Error] {mongo_err}")
+
+            # [신규 추가] 히스토리 유지를 위한 MongoDB 공통 함수 호출
+            save_chat_to_mongo(current_user_id, "tech", user_message, gpt_response)
 
             # 4. Vector DB 저장
             vector_db = getattr(current_app, 'vector_db', None)
@@ -186,13 +199,12 @@ def ask():
         return jsonify({'response': '서버 통신 오류가 발생했습니다.'}), 500
 
 
-# --- 3. 리포트 생성 함수 (/api/tech/report) ---
+# --- 3. 리포트 생성 함수 (/api/tech/report) --- (기존 유지)
 @bp.route('/report', methods=['GET'], strict_slashes=False)
 def generate_report():
     user_id = session.get('user_id', 1)
 
     try:
-        # UseBox 조인을 통해 테크(ai_id=8) 기록만 필터링
         history = ChatLog.query.join(UseBox).filter(
             UseBox.user_id == user_id,
             UseBox.ai_id == 8

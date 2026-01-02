@@ -7,6 +7,8 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from datetime import datetime, timezone
 from backend.models import db, ChatLog, UseBox  # UseBox 모델 임포트 추가
+# --- [신규 추가] database.py의 함수 임포트 ---
+from backend.views.database import save_chat_to_mongo, get_chat_from_mongo
 
 # 환경 변수 로드
 load_dotenv()
@@ -42,7 +44,7 @@ SYSTEM_PROMPT = """
 - 답변의 마지막에 반드시 "⭐ 중요: 저는 AI 웰니스 코치이며, 의학적 진단이나 치료를 대체할 수 없습니다. 심각한 심리적 어려움은 반드시 전문의나 상담 센터의 도움을 받으세요."를 포함합니다.
 """
 
-# OpenAI 클라이언트 초기화
+# OpenAI 클라이언트 초기화 (기존 유지)
 client = None
 try:
     api_key = os.environ.get("OPENAI_API_KEY")
@@ -60,6 +62,12 @@ except Exception as e:
 def chat_usage():
     user_name = session.get('user_name', USER_NAME)
     user_id = session.get('user_id')
+
+    # [수정 부분] 기존 웰니스 상담 내역이 있는지 확인하여 가져옴
+    history = []
+    if user_id:
+        # 카테고리를 'wellness'로 지정하여 MongoDB 기록 조회
+        history = get_chat_from_mongo(user_id, "wellness")
 
     intro_html = f"""
     <div class="initial-text" style="margin-top: 5px;">
@@ -87,7 +95,8 @@ def chat_usage():
         "user_name": user_name,
         "is_logged_in": bool(user_id),
         "chat_title": CHAT_TITLE,
-        "intro_html": intro_html
+        "intro_html": intro_html,
+        "history": history  # [신규 추가] 기존 대화 내역 전달
     })
 
 
@@ -145,7 +154,7 @@ def ask():
             db.session.commit()
             sql_id = new_log.id
 
-            # 3. MongoDB 저장 (Atlas)
+            # 3. MongoDB 저장 (기존 코드 유지)
             mongodb = getattr(current_app, 'mongodb', None)
             if mongodb is not None:
                 try:
@@ -162,7 +171,10 @@ def ask():
                 except Exception as mongo_err:
                     print(f"[Wellness Mongo Error] {mongo_err}")
 
-            # 4. Vector DB 저장
+            # [신규 추가] 히스토리 유지를 위한 MongoDB 공통 함수 호출
+            save_chat_to_mongo(current_user_id, "wellness", user_message, gpt_response)
+
+            # 4. Vector DB 저장 (기존 유지)
             vector_db = getattr(current_app, 'vector_db', None)
             if vector_db is not None:
                 try:
@@ -173,8 +185,6 @@ def ask():
                     )
                 except Exception as vec_err:
                     print(f"[Wellness Vector Error] {vec_err}")
-
-            print(f"[Wellness] Hybrid Storage Success: User {current_user_id}")
 
         except Exception as db_err:
             db.session.rollback()
@@ -187,13 +197,12 @@ def ask():
         return jsonify({'response': '대화 중 오류가 발생했습니다.'}), 500
 
 
-# --- 3. 리포트 생성 함수 (/wellness/report) ---
+# --- 3. 리포트 생성 함수 (/wellness/report) --- (기존 유지)
 @bp.route('/report', methods=['GET', 'POST'])
 def generate_report():
     user_id = session.get('user_id', 1)
 
     try:
-        # UseBox 조인을 통해 웰니스(ai_id=2) 기록만 필터링
         logs = ChatLog.query.join(UseBox).filter(
             UseBox.user_id == user_id,
             UseBox.ai_id == 1
