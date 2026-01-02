@@ -19,7 +19,7 @@ export default function NoticeDetail() {
     error: null
   });
 
-  // 데이터 로드 (두 번 호출 해결)
+  // 데이터 로드
   useEffect(() => {
     const loadDetail = async () => {
       try {

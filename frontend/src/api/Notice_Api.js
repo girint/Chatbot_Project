@@ -1,6 +1,6 @@
 // src/api/Notice_Api.js
 import axios from 'axios';
-import { AuthUtils } from './User_Api';
+import { TokenManager } from './User_Api';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -12,7 +12,7 @@ const client = axios.create({
 
 //토큰 처리 인터셉터
 client.interceptors.request.use((config) => {
-  const token = AuthUtils.getNickname() || localStorage.getItem('authToken');
+  const token = TokenManager.getNickname();
 
   if (token) {
     const encodedToken = encodeURIComponent(token);
@@ -28,20 +28,13 @@ client.interceptors.request.use((config) => {
 // ===== 1. 게시글 등록 =====
 export const create_notice = async (noticeData) => {
   try {
-    const token = localStorage.getItem('authToken');
-    console.log('🔍 Notice_Api 토큰:', token);
-
     //로그인 체크
-    if (!token) {
-      console.log('❌ 토큰 없음 → 로그인 필요');
+    if (!TokenManager.isLoggedIn()) {
       return {
         success: false,
         error: '로그인 후 이용해주세요.'
       };
     }
-
-    // 🔥 한글 토큰 URL 인코딩
-    const encodedToken = encodeURIComponent(token);
 
     // FormData 자동 변환
     let formData;
@@ -58,24 +51,11 @@ export const create_notice = async (noticeData) => {
       }
     }
 
-    // FormData 디버깅
-    console.log('📤 FormData 내용:');
-    for (let [key, value] of formData.entries()) {
-      console.log(`  ${key}:`, value);
-    }
+    const response = await client.post('/notices', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
 
-    const response = await axios.post(
-      `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/notices`,
-      formData,
-      {
-        headers: {
-          'Authorization': `Bearer ${encodedToken}`,
-          'Content-Type': 'multipart/form-data',
-        }
-      }
-    );
-
-    console.log('✅ 게시글 등록 성공:', response.data);
+    console.log('✅ 게시글 등록 성공:');
     return response.data;
 
   } catch (error) {

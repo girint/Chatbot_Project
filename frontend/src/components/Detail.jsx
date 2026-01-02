@@ -15,21 +15,11 @@ export default function Detail() {  // props로 aiId 받기
     const [hasReview, setHasReview] = useState(false);
     const [hasUsedAi, setHasUsedAi] = useState(false);
     const [aiDetail, setAiDetail] = useState(null);
-
     const navigate = useNavigate();
 
     useEffect(() => {
-        loadAiDetail();
         fetchDetail();
     }, [aiId]);
-
-    const loadAiDetail = async () => {
-        const data = await Api.fetchAiDetail(aiId);
-        setAiDetail(data.ai);
-        setCanWrite(data.can_write_review);
-        setHasReview(data.has_review);
-        setHasUsedAi(data.has_used_ai);
-    };
 
     const fetchDetail = async () => {
         try {
@@ -74,7 +64,7 @@ export default function Detail() {  // props로 aiId 받기
             );
 
         // ✅ 삭제 후 즉시 상태 갱신
-        await loadAiDetail();
+        await fetchDetail();
     };
 
     if (loading) return <div>로딩 중...</div>;

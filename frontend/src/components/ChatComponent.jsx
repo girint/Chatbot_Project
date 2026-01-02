@@ -60,16 +60,18 @@ const ChatComponent = () => {
             }
 
             try {
-                // B. 최신 유저 프로필 및 닉네임 가져오기
-                let currentName = '사용자';
-                if (typeof getMyProfile === 'function') {
-                    const data = await getMyProfile();
-                    setUserInfo(data);
-                    currentName = data.user_nickname || data.nickname || '사용자';
-                } else {
-                    // API 미구현 시 세션스토리지에서 가져오기
-                    currentName = sessionStorage.getItem('user_name') || sessionStorage.getItem('nickname') || '사용자';
-                }
+                const token = localStorage.getItem("authToken");
+                const currentName = token || '사용자';
+//                 // B. 최신 유저 프로필 및 닉네임 가져오기
+//                 let currentName = '사용자';
+//                 if (typeof getMyProfile === 'function') {
+//                     const data = await getMyProfile();
+//                     setUserInfo(data);
+//                     currentName = data.user_nickname || data.nickname || '사용자';
+//                 } else {
+//                     // API 미구현 시 세션스토리지에서 가져오기
+//                     currentName = sessionStorage.getItem('user_name') || sessionStorage.getItem('nickname') || '사용자';
+//                 }
                 setNickname(currentName);
 
                 // C. 서버로부터 챗봇 인트로 정보 가져오기

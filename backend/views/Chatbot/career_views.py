@@ -126,7 +126,7 @@ def ask():
 
         # --- 저장 로직 ---
         try:
-            CAREER_AI_ID = 5
+            CAREER_AI_ID = 2
             usebox = UseBox.query.filter_by(user_id=current_user_id, ai_id=CAREER_AI_ID).first()
 
             if not usebox:
@@ -191,7 +191,7 @@ def generate_report():
     try:
         history = ChatLog.query.join(UseBox).filter(
             UseBox.user_id == user_id,
-            UseBox.ai_id == 5
+            UseBox.ai_id == 2
         ).order_by(ChatLog.created_at.desc()).limit(5).all()
 
         if not history:

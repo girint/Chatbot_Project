@@ -1,26 +1,111 @@
+// src/components/.../ChatList.jsx
 import '../../css/ChatList.css'
-import {  useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { GetLastChat } from '../../api/Chatlist_Api';
+import { TokenManager } from '../../api/User_Api';
 
 export default function ChatList() {
     const topProfiles = [
-        { id:1, name: "웰니스 코치", img:"/img/chatlist2.png"},
-        { id:2, name: "커리어 멘토", img:"/img/chatlist2.png"},
-        { id:3, name: "금융 가이드", img:"/img/chatlist2.png"},
-        { id:4, name: "건강 매니저", img:"/img/chatlist2.png"},
+        { id:1, name: "커스텀1", img:"/img/chatlist2.png"},
+        { id:2, name: "커스텀2", img:"/img/chatlist2.png"},
+        { id:3, name: "커스텀3", img:"/img/chatlist2.png"},
+        { id:4, name: "커스텀4", img:"/img/chatlist2.png"},
     ];
 
-    const rooms = [
-        {id:1, title:"웰니스 코치", preview:"사람들은 누구나 마음속에 마음의알을 가지고 태어난다."},
-        {id:2, title:"커리어 멘토", preview:"내 꿈은 해적왕."},
-        {id:3, title:"금융 가이드", preview:"인생 한방."},
-        {id:4, title:"건강 매니저", preview:"건강한 생활을 관리한다."},
-        {id:5, title:"데일리 도우미", preview:"오늘 집에가서 게임할거다."},
-        {id:6, title:"학습 서포터", preview:"공동묘지에 올라갔더니 시체가 벌떡."},
-        {id:7, title:"채팅방", preview:"..."},
-        {id:8, title:"쌓이면서", preview:"..."},
-        {id:9, title:"스크롤 생기는거", preview:"..."},
-        {id:10, title:"확인용", preview:"..."},
-    ];
+    // ★ API에서 받을 데이터
+    const [rooms, setRooms] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchLastChats = async () => {
+            try {
+                setLoading(true);
+                 const userId = await TokenManager.getUserId();
+                    if (!userId) {
+                      setError("로그인 후 이용해주세요.");
+                      setLoading(false);
+                      return;
+                    }
+
+                const data = await GetLastChat(userId);
+
+                setRooms(data.last_chats || []);
+            } catch (err) {
+                console.error(err);
+                setError("채팅 목록을 불러오지 못했습니다.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchLastChats();
+    }, []);
+
+    const handleChatClick = (room) => {
+        const token = TokenManager.getNickname();;
+        if (!token) {
+            alert("로그인 후 이용이 가능합니다.");
+            navigate("/login");
+            return;
+        }
+        navigate(`/${room}`);
+    };
+
+    if (loading) {
+        // 로딩 UI (생략)
+        return <div>로딩 중...</div>;
+    }
+
+    if (error) {
+        return <div>{error}</div>;
+    }
+
+    if (loading) {
+        return (
+            <div className='chatListPage'>
+                <div className='chatListShell'>
+                    <div className='chatTop'>
+                        <div className='topIcons'>
+                            {topProfiles.map((p) => (
+                                <button key={p.id} className='iconCircleBtn' type='button' title={p.name}>
+                                    <img className='iconCircleImg' src={p.img} alt={p.name} />
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div className='chatListBody'>
+                        <div className='chatRoomRow'>로딩 중...</div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className='chatListPage'>
+                <div className='chatListShell'>
+                    <div className='chatTop'>
+                        <div className='topIcons'>
+                            {topProfiles.map((p) => (
+                                <button key={p.id} className='iconCircleBtn' type='button' title={p.name}>
+                                    <img className='iconCircleImg' src={p.img} alt={p.name} />
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div className='chatListBody'>
+                        <div className='chatRoomRow'>{error}</div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+
 
     return (
         <div className='chatListPage'>
@@ -38,12 +123,23 @@ export default function ChatList() {
 
                 {/* 목록 영역만 스크롤 */}
                 <div className='chatListBody'>
+                    {rooms.length === 0 && (
+                        <div className='chatRoomRow'>최근 대화가 없습니다.</div>
+                    )}
+
                     {rooms.map((r) => (
-                        <div key={r.id} className='chatRoomRow'>
-                            <div className='chatAvatar' />
+                        <div key={r.use_id} className='chatRoomRow' onClick={() => handleChatClick(r.ai_content)} style={{ cursor: 'pointer' }}>
+                            <div className='chatAvatar'>
+                                {/* AI 프로필 이미지 */}
+                                {r.ai_image && ( <img src={r.ai_image} alt={r.ai_name} className='chatAvatarImg' /> )}
+                            </div>
                             <div className='chatRoomText'>
-                                <div className='chatRoomTitle'>{r.title}</div>
-                                <div className='chatRoomPreview'>{r.preview}</div>
+                                {/* AI 이름 */}
+                                <div className='chatRoomTitle'>{r.ai_name}</div>
+                                {/* 마지막 대화(프리뷰) */}
+                                <div className='chatRoomPreview'>
+                                    {r.last_question || r.last_answer || '대화 내용 없음'}
+                                </div>
                             </div>
                         </div>
                     ))}

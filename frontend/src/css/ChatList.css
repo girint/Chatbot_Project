@@ -26,6 +26,7 @@
 .chatRoomRow {display: flex;gap: 12px;padding: 14px 16px;border-bottom: 1px solid #fff;}
 
 .chatAvatar {width: 44px;height: 44px;border-radius: 100%;background: #ddd;flex: 0 0 auto;}
+.chatAvatarImg {width:100%; height: 100%}
 
 .chatRoomText {min-width: 0;}
 .chatRoomTitle {font-weight: 800;font-size: 14px;}

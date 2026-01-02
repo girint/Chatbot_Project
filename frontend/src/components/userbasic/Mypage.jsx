@@ -3,9 +3,9 @@
 import React,{ useEffect, useState } from 'react'
 import { Container, Row, Col, Image, Form, InputGroup, Button } from 'react-bootstrap';
 import { updateProfile } from '../../api/Mypage_Api';
-import  { AuthUtils }  from '../../api/User_Api';
+import  { AuthUtils,TokenManager }  from '../../api/User_Api';
 import '../../css/User.css'
-import { getMyProfile } from '../../api/Mypage_Api';
+import { getMyProfile,delete_user } from '../../api/Mypage_Api';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -19,6 +19,7 @@ const Mypage = () => {
   const [profileFile, setProfileFile] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
 
   const handleChangeNickname = async () => {
@@ -72,8 +73,23 @@ const Mypage = () => {
 
   const handleDeleteUser = async () => {
     if (!window.confirm('정말 회원탈퇴 하시겠습니까?')) return;
-    AuthUtils.logout();
-    alert('회원탈퇴 API 준비 중입니다.');
+
+    try {
+      setIsSubmitting(true);
+
+      //Mypage_Api 사용
+      const result = await delete_user();
+
+      if (result.success) {
+        TokenManager.logout();
+        alert('회원탈퇴가 완료되었습니다! 🙏');
+        navigate('/');
+      }
+    } catch (error) {
+      alert(`회원탈퇴 실패: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   //GPT (유저정보 불러오기)

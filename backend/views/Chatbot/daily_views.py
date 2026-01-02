@@ -132,7 +132,7 @@ def ask():
 
         # --- 하이브리드 저장 로직 ---
         try:
-            DAILY_AI_ID = 5  # 예시 ID 유지
+            DAILY_AI_ID = 5
             usebox = UseBox.query.filter_by(user_id=current_user_id, ai_id=DAILY_AI_ID).first()
 
             if not usebox:

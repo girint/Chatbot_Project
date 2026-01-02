@@ -5,10 +5,8 @@ from functools import wraps
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 import os, uuid
-
 from backend.models import db, User
 from urllib.parse import unquote
-from datetime import datetime
 
 mypage_bp = Blueprint("mypage", __name__)
 
@@ -22,7 +20,7 @@ def token_required(f):
         raw_token = auth_header.replace("Bearer ", "")
         nickname_token = unquote(raw_token)
 
-        user = User.query.filter_by(user_nickname=nickname_token).first()
+        user = User.query.filter_by(user_nickname=nickname_token,user_delete=False).first()
         if not user:
             return jsonify({'success': False, 'message': '유저를 찾을 수 없습니다.'}), 404
 
@@ -87,7 +85,35 @@ def update_user_profile(user):
 def get_user_profile(user):
     return jsonify({
         "success": True,
+        "user_id": user.user_id,
         "user_nickname": user.user_nickname,
-        "user_money": user.user_money,                 
+        "user_money": user.user_money,
         "image": user.user_image,
+        "user_image":user.user_email,
                 }), 200
+
+
+@mypage_bp.route('/users/delete', methods=['DELETE'])
+@token_required
+def delete_user():
+    try:
+        auth_header = request.headers.get("Authorization")
+        raw_token = auth_header.replace("Bearer ", "")
+        nickname_token = unquote(raw_token)
+        user = User.query.filter_by(user_nickname=nickname_token, user_delete=False).first()
+        #익명화 + Soft Delete!
+        user.user_nickname = f"s{user.user_id}"  # s+id
+        user.user_email = f"s{user.user_id}@deleted.com"
+        user.user_delete = True  # 삭제 플래그!
+
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': '회원탈퇴가 완료되었습니다.',
+            'deleted_user_id': user.user_id
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500

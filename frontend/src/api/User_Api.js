@@ -1,48 +1,60 @@
 // frrontend/src/api/user_Api.js
-
 import axios from 'axios';
 
-// =====  User전용 API  ============================
-export const protectedApi = axios.create({
-  baseURL: 'http://localhost:5000/api',
-});
+export const protectedApi = axios.create({ baseURL: 'http://localhost:5000/api' });
+export const publicApi = axios.create({ baseURL: 'http://localhost:5000/api' });
 
-//토큰 값을 닉네임으로 지정해주기
-protectedApi.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("authToken");  // ✅ 통일된 키 이름
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;  // Bearer john123
-    }
-    return config;
+
+// 토큰 매니저를 통해서 유저 아이디 빨리 불러올수 있게 하기
+export const TokenManager = {
+  save: (nickname) => {
+    localStorage.setItem("authToken", nickname);
+    localStorage.setItem("userNickname", nickname);
+    window.dispatchEvent(new Event("auth-change"));
   },
-  (error) => Promise.reject(error)
-);
-
-// 추후에 사용예정: 401에러시 자동 로그아웃
-protectedApi.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    //if ([401, 403].includes(error.response?.status)) { 나중에 2개 이상 에러에도 적용하고 싶을때 쓸 코드
-    if (error.response?.status === 401) {
-      AuthUtils.logout();
-      window.location.href = "/login";
+  clear: () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userNickname");
+    localStorage.removeItem("userId");
+    window.dispatchEvent(new Event("auth-change"));
+  },
+  //닉네임불러오기 함수
+  getNickname: () => localStorage.getItem("authToken") || null,
+  isLoggedIn: () => !!localStorage.getItem("authToken"),
+  //프로필 전부 불러오기 함수
+  getUserProfile: async () => {
+    const token = TokenManager.getNickname();
+    if (!token) return null;
+    try {
+      return (await protectedApi.get('/users/mypage')).data;
+    } catch {
+      return null;
     }
-    return Promise.reject(error);
+  },
+  //아이디 불러오기 함수
+  getUserId: async () => {
+    const profile = await TokenManager.getUserProfile();
+    return profile?.user_id;
   }
-);
-// 멘트 고치기!
+};
 
-//보호된 API 함수들 사용법
-export const getProfile = () => protectedApi.get('/profile');
-export const getPosts = () => protectedApi.get('/posts');
-
-// === 비user 전용 함수들 ==============================================
-
-// =====  비user 전용 API  =====
-export const publicApi = axios.create({
-  baseURL: 'http://localhost:5000/api',
+// 인터셉터 실제 구헌 함수
+protectedApi.interceptors.request.use(config => {
+  const token = TokenManager.getNickname();
+  if (token) {
+    config.headers.Authorization = `Bearer ${encodeURIComponent(token)}`;
+  }
+  return config;
 });
+
+// 실제 토큰매니저 활성화 시키기
+export const AuthUtils = {
+  login: TokenManager.save,
+  logout: TokenManager.clear,
+  isLoggedIn: TokenManager.isLoggedIn,
+  getNickname: TokenManager.getNickname
+};
+
 
 // 1. 닉네임 이메일 중복 체크 API
 export async function Id_Check(type, value) {
@@ -69,21 +81,3 @@ export const loginUser = async (email, password) => {
 
 
 
-// ===== 인증 유틸리티 ==========================================================
-export const AuthUtils = {
-  login: (nickname) => {
-    console.log(`🔐 로그인: 토큰 "${nickname}" 저장`);
-    localStorage.setItem("authToken", nickname);
-    window.dispatchEvent(new Event("auth-change"));
-  },
-  logout: () => {
-    console.log('🔓 로그아웃: 토큰 삭제 시작');
-    const beforeToken = localStorage.getItem("authToken");
-    localStorage.removeItem("authToken");
-    console.log(`✅ 토큰 삭제 완료: "${beforeToken}" → 없음`);
-    window.dispatchEvent(new Event("auth-change"));
-  },
-  isLoggedIn: () => !!localStorage.getItem("authToken"),
-  getNickname: () => localStorage.getItem("authToken")
-};
-//=============================================================================

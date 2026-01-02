@@ -35,13 +35,11 @@ function App() {
             <Route path="/Signup" element={<Signup />} />
             <Route path="/Mypage" element={<Mypage />} />
             <Route path="/Pay" element={<Pay />} />
-{/*             <Route path='/Detail' element={<Detail />} /> */}
             <Route path="/api/ai/:aiId" element={<Detail />} />
             <Route path='/ErrorPage' element={<ErrorPage />} />
             <Route path='/NoticeWrite' element={<NoticeWrite />} />
             <Route path='/ChatList' element={<ChatList />} />
             <Route path="/notice/:noticeId" element={<NoticeDetail />} />
-            {/* --- [통합 챗봇 컴포넌트 type에 맞춰서 적어줘야함] --- */}
             <Route path="/:type" element={<ChatComponent />} />
         </Routes>   
         <Outlet />

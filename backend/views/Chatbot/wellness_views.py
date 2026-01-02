@@ -125,8 +125,8 @@ def ask():
 
         # --- 하이브리드 저장 로직 수정 (SQL + MongoDB + Vector DB) ---
         try:
-            # 1. UseBox 권한 확인 및 생성 (웰니스 코치 ai_id = 2)
-            WELLNESS_AI_ID = 2
+            # 1. UseBox 권한 확인 및 생성 (웰니스 코치 ai_id = 1)
+            WELLNESS_AI_ID = 1
             usebox = UseBox.query.filter_by(user_id=current_user_id, ai_id=WELLNESS_AI_ID).first()
 
             if not usebox:
@@ -196,7 +196,7 @@ def generate_report():
         # UseBox 조인을 통해 웰니스(ai_id=2) 기록만 필터링
         logs = ChatLog.query.join(UseBox).filter(
             UseBox.user_id == user_id,
-            UseBox.ai_id == 2
+            UseBox.ai_id == 1
         ).order_by(ChatLog.created_at.desc()).limit(10).all()
 
         if not logs:

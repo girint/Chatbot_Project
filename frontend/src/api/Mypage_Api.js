@@ -1,6 +1,6 @@
 //frontend/src/api/Mypage_Api.js
 import axios from 'axios';
-import { AuthUtils } from './User_Api';
+import { AuthUtils,TokenManager } from './User_Api';
 
 
 const api = axios.create({
@@ -45,3 +45,22 @@ export async function getMyProfile() {
   const res = await api.get('/users/mypage');
   return res.data;
 }
+
+//회원탈퇴 API
+export const delete_user = async () => {
+  const token = TokenManager.getToken();
+
+  const response = await fetch(`users/delete`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+
+  return await response.json();
+};
