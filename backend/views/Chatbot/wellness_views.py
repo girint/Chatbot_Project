@@ -14,7 +14,7 @@ from backend.views.database import save_chat_to_mongo, get_chat_from_mongo
 load_dotenv()
 
 # 블루프린트 설정
-bp = Blueprint('wellness_chat', __name__, url_prefix='/wellness')
+bp = Blueprint('wellness_chat', __name__, url_prefix='/api/wellness')
 
 # --- 챗봇 환경 설정 ---
 USER_NAME = "사용자님"

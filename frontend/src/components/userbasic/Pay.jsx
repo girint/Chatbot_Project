@@ -5,6 +5,7 @@ import "../../css/Pay.css";
 export default function PaymentMethodSelect({ value, onChange, defaultValue = "CARD" }) {
     const groupId = useId();
 
+
     // ✅ 부모에서 value를 안 주면 내부 상태로 동작(언컨트롤드)
     const isControlled = value !== undefined;
     const [innerValue, setInnerValue] = useState(defaultValue);
@@ -35,7 +36,7 @@ export default function PaymentMethodSelect({ value, onChange, defaultValue = "C
 
 
     //충전금액 확인
-    const [currentCoin] = useState(2000); // 예시: 서버/props로 받으면 더 좋음
+    const [currentCoin] = useState(1000); // 예시: 서버/props로 받으면 더 좋음
     const [chargeCoin, setChargeCoin] = useState(1000); // 기본 선택
     const totalCoin = currentCoin + chargeCoin;
 

@@ -61,7 +61,7 @@ const ChatComponent = () => {
 
                 // C. 서버로부터 챗봇 인트로 정보 가져오기
                 const res = await await protectedApi.get(`/${type}/`);
-                const data = await res.json();
+                const data = await res.data;
 
                 if (data.status === "success") {
                     // [정석 로직] 서버가 주는 intro_html을 가공 없이 그대로 노출합니다.
@@ -97,7 +97,7 @@ const ChatComponent = () => {
         setIsTyping(true);
 
         try {
-            const res = await fetch(`http://localhost:5000/${type}/ask`, {
+            const res = await fetch(`http://localhost:5000/api/${type}/ask`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: currentMsg }),
@@ -118,7 +118,7 @@ const ChatComponent = () => {
         if (chat.length < 2) return alert("대화가 부족합니다.");
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:5000/${type}/report`, { credentials: 'include' });
+            const res = await fetch(`http://localhost:5000/api/${type}/report`, { credentials: 'include' });
             const data = await res.json();
             if (data.report) setReport(data.report);
         } finally {

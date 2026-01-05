@@ -2,7 +2,7 @@
 /* 게시글 상세 페이지 */
 /* ---------------------------------------------- */
 /* 전체 배경 */
-.nd-page {min-height: 100vh;padding: 28px 12px;display: flex;justify-content: center;background: #fff;}
+.nd-page {min-height: 100vh;padding: 28px 12px;display: flex;justify-content: center;background: #fff; margin-top: 80px;}
 
 /* 카드 (중앙 프레임) */
 .nd-card {width: min(720px, 100%);border: 1px solid #e7e7e7;border-radius: 10px;padding: 18px 18px 22px;background: #fff;}

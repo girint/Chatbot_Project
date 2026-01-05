@@ -5,7 +5,6 @@ import * as Api from '../api/AI_Detail_Api.js';
 
 export default function Detail() {  // props로 aiId 받기
     const { aiId } = useParams();
-    console.log('🔍 useParams aiId:', aiId);
     const [aiData, setAiData] = useState(null);
     const [reviews, setReviews] = useState([]);
     const [newReview, setNewReview] = useState('');
@@ -18,6 +17,7 @@ export default function Detail() {  // props로 aiId 받기
     const navigate = useNavigate();
 
     useEffect(() => {
+        console.log('🔍 useParams aiId:', aiId);
         fetchDetail();
     }, [aiId]);
 

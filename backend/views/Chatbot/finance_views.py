@@ -27,7 +27,7 @@ except ImportError:
 load_dotenv()
 
 # 블루프린트 생성
-bp = Blueprint('finance_chat', __name__, url_prefix='/finance')
+bp = Blueprint('finance_chat', __name__, url_prefix='/api/finance')
 
 # --- 챗봇 환경 설정 ---
 USER_NAME = "자유로움"

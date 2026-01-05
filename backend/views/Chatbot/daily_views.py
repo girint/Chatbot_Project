@@ -13,7 +13,7 @@ from backend.views.database import save_chat_to_mongo, get_chat_from_mongo
 load_dotenv()
 
 # 블루프린트 생성
-bp = Blueprint('daily_chat', __name__, url_prefix='/daily')
+bp = Blueprint('daily_chat', __name__, url_prefix='/api/daily')
 
 # --- 챗봇 환경 설정 ---
 DEFAULT_NAME = "사용자"
