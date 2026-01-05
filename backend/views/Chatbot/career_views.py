@@ -5,8 +5,11 @@ import json
 from flask import Blueprint, render_template, request, jsonify, session, current_app
 from openai import OpenAI
 from dotenv import load_dotenv
-from backend.models import db, ChatLog, UseBox
 from datetime import datetime, timezone
+# --- [신규 추가] database.py의 함수 임포트 ---
+
+from backend.models import db, ChatLog, UseBox
+from backend.views.database import save_chat_to_mongo, get_chat_from_mongo
 
 load_dotenv()
 
@@ -14,11 +17,10 @@ load_dotenv()
 bp = Blueprint('career_chat', __name__, url_prefix='/career')
 
 # --- 챗봇 환경 설정 ---
-# [수정] 고정된 "자유로움" 제거 및 기본값 설정
 DEFAULT_NAME = "사용자"
 CHAT_TITLE = "커리어 개발 및 취업 준비 챗봇"
 
-# [수정] SYSTEM_PROMPT 내의 설명도 동적으로 구성하기 위해 f-string이 아닌 템플릿 형태로 유지
+# SYSTEM_PROMPT (기존 내용 100% 유지)
 SYSTEM_PROMPT = """
 당신은 사용자의 경력 발전과 성공적인 취업을 위한 실질적인 정보와 전략을 제공하는 '스마트하고 전략적인 커리어 멘토' 챗봇입니다.
 사용자 이름: {user_name}
@@ -44,7 +46,7 @@ SYSTEM_PROMPT = """
 - 추상적인 조언보다는 '지금 당장 해야 할 일' 위주로 구체적으로 작성하세요.
 """
 
-# OpenAI 클라이언트 초기화
+# OpenAI 클라이언트 초기화 (기존 유지)
 client = None
 try:
     api_key = os.environ.get("OPENAI_API_KEY")
@@ -60,11 +62,15 @@ except Exception as e:
 # --- 1. 초기 안내 프롬프트 제공 (/career/) ---
 @bp.route('/')
 def chat_usage():
-    # [수정] 실시간 닉네임 확보: user_nickname -> user_name -> 기본값 순서
     user_name = session.get('user_nickname') or session.get('user_name') or DEFAULT_NAME
     user_id = session.get('user_id')
 
-    # [수정] intro_html 내의 모든 고정 이름을 {user_name} 변수로 교체
+    # [수정 부분] 기존 커리어 상담 내역이 있는지 확인하여 가져옴
+    history = []
+    if user_id:
+        # 카테고리를 'career'로 지정하여 MongoDB 기록 조회
+        history = get_chat_from_mongo(user_id, "career")
+
     chat_intro_html = f"""
     <div class="initial-text" style="margin-top: 5px;">
         <b>환영합니다!</b> {user_name}님! {user_name}님의 성공적인 내일을 설계하는 '커리어 및 취업 준비' 챗봇입니다!
@@ -89,7 +95,8 @@ def chat_usage():
         "user_name": user_name,
         "is_logged_in": bool(user_id),
         "chat_title": CHAT_TITLE,
-        "intro_html": chat_intro_html
+        "intro_html": chat_intro_html,
+        "history": history  # [신규 추가] 기존 대화 내역 전달
     })
 
 
@@ -100,7 +107,6 @@ def ask():
         return jsonify({'response': 'OpenAI API Key is missing.'}), 500
 
     current_user_id = session.get('user_id', 1)
-    # [수정] 질문 처리 시에도 실시간 닉네임 사용
     user_name = session.get('user_nickname') or session.get('user_name') or DEFAULT_NAME
 
     try:
@@ -110,7 +116,6 @@ def ask():
         if not user_message:
             return jsonify({'response': '메시지를 입력해주세요.'}), 400
 
-        # [수정] SYSTEM_PROMPT에 실시간 user_name 주입
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT.format(user_name=user_name)},
             {"role": "user", "content": user_message}
@@ -126,7 +131,7 @@ def ask():
 
         # --- 저장 로직 ---
         try:
-            CAREER_AI_ID = 5
+            CAREER_AI_ID = 2
             usebox = UseBox.query.filter_by(user_id=current_user_id, ai_id=CAREER_AI_ID).first()
 
             if not usebox:
@@ -144,6 +149,7 @@ def ask():
             db.session.commit()
             sql_id = new_log.id
 
+            # 기존 MongoDB Atlas 저장 (기존 유지)
             mongodb = getattr(current_app, 'mongodb', None)
             if mongodb is not None:
                 try:
@@ -159,6 +165,11 @@ def ask():
                 except Exception as mongo_err:
                     print(f"[Career Mongo Error] {mongo_err}")
 
+            # [신규 추가] 히스토리 유지를 위한 MongoDB 공통 함수 호출
+            # category를 'career'로 지정하여 저장합니다.
+            save_chat_to_mongo(current_user_id, "career", user_message, ai_response)
+
+            # Vector DB 저장 (기존 유지)
             vector_db = getattr(current_app, 'vector_db', None)
             if vector_db is not None:
                 try:
@@ -181,17 +192,16 @@ def ask():
         return jsonify({'response': '서버 통신 오류가 발생했습니다.'}), 500
 
 
-# --- 3. 리포트 생성 (/career/report) ---
+# --- 3. 리포트 생성 (/career/report) --- (기존 유지)
 @bp.route('/report', methods=['GET'])
 def generate_report():
     user_id = session.get('user_id', 1)
-    # [수정] 리포트 생성 시에도 사용자 이름을 반영할 수 있도록 변수 확보
     user_name = session.get('user_nickname') or session.get('user_name') or DEFAULT_NAME
 
     try:
         history = ChatLog.query.join(UseBox).filter(
             UseBox.user_id == user_id,
-            UseBox.ai_id == 5
+            UseBox.ai_id == 2
         ).order_by(ChatLog.created_at.desc()).limit(5).all()
 
         if not history:

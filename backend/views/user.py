@@ -129,18 +129,11 @@ def user_login():
     if not user_data or not check_password_hash(user_data.user_password, password):
         return jsonify({'success': False, 'message': '이메일 또는 비밀번호가 틀립니다.'}), 401
 
-    # [수정] 로그인 성공 시 서버 세션에 정보 저장
-    session.clear()  # 기존 세션 초기화 (선택사항)
-    session['user_id'] = user_data.user_id
-    session['user_nickname'] = user_data.user_nickname  # 이 줄이 핵심입니다!
-    session['user_email'] = user_data.user_email
-    session.permanent = True  # 세션 유지 설정
-
-
 
     # 로그인 성공 시 닉네임, 이메일 반환
     return jsonify({
         'success': True,
         'message': '로그인 성공',
+        'user_id': user_data.user_id,
         "nickname": user_data.user_nickname,
     })

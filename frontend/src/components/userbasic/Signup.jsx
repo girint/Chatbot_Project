@@ -2,8 +2,8 @@
 import '../../css/User.css'
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { debounce } from 'lodash';  // 실시간 중복체크 딜레이 처리 아이디 입력시 api 불려와야하는데 너무 빠르게 불러오면 비용up
-import { Id_Check, New_User } from '../../api/User_Api';  // API 연동
+import { debounce } from 'lodash';
+import { Id_Check, New_User } from '../../api/User_Api';
 
 import { Container, Row, Col, Button, Form, Card, Table, InputGroup, Image } from "react-bootstrap";
 import { FaGoogle, FaComment } from "react-icons/fa";   //부트스트랩 불러오기

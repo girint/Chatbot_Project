@@ -7,6 +7,8 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from backend.models import db, ChatLog, UseBox  # UseBox 모델 임포트 추가
 from datetime import datetime, timezone
+# --- [신규 추가] database.py의 함수 임포트 ---
+from backend.views.database import save_chat_to_mongo, get_chat_from_mongo
 
 load_dotenv()
 
@@ -45,7 +47,7 @@ SYSTEM_PROMPT = """
 7. 면책 조항: 답변의 마지막에 "⭐ 중요: 이 챗봇은 법률 정보를 제공하지만, 공식적인 법적 자문이나 소송 대리를 대체할 수 없습니다. 중요한 법적 문제에 대해서는 반드시 변호사 등 전문 법조인과 상담하시길 권장합니다."라는 면책 조항을 포함합니다.
 """
 
-# OpenAI 클라이언트 초기화
+# OpenAI 클라이언트 초기화 (기존 유지)
 client = None
 try:
     api_key = os.environ.get("OPENAI_API_KEY")
@@ -63,6 +65,12 @@ except Exception as e:
 def chat_usage():
     user_name = session.get('user_name', USER_NAME)
     user_id = session.get('user_id')
+
+    # [수정 부분] 기존 상담 내역이 있는지 확인하여 가져옴
+    history = []
+    if user_id:
+        # database.py에서 만든 함수로 MongoDB 기록 조회
+        history = get_chat_from_mongo(user_id, "legal")
 
     chat_intro_html = f"""
     <div class="initial-text" style="margin-top: 5px;">
@@ -91,7 +99,8 @@ def chat_usage():
         "user_name": user_name,
         "is_logged_in": bool(user_id),
         "chat_title": f"{user_name}님의 법률 자문",
-        "intro_html": chat_intro_html
+        "intro_html": chat_intro_html,
+        "history": history  # [신규 추가] 기존 대화 내역 전달
     })
 
 
@@ -147,7 +156,7 @@ def ask():
             db.session.commit()
             sql_id = new_log.id
 
-            # 3. MongoDB 저장 (Atlas)
+            # 3. MongoDB 저장 (Atlas) - 기존 코드 유지
             mongodb = getattr(current_app, 'mongodb', None)
             if mongodb is not None:
                 try:
@@ -164,7 +173,11 @@ def ask():
                 except Exception as mongo_err:
                     print(f"[Legal Mongo Error] {mongo_err}")
 
-            # 4. Vector DB 저장
+            # [신규 추가] 4. 히스토리 유지를 위한 신규 MongoDB 저장 함수 호출
+            # category를 'legal'로 지정하여 저장합니다.
+            save_chat_to_mongo(current_user_id, "legal", user_message, ai_response)
+
+            # 5. Vector DB 저장 (기존 유지)
             vector_db = getattr(current_app, 'vector_db', None)
             if vector_db is not None:
                 try:
@@ -189,7 +202,7 @@ def ask():
         return jsonify({'response': '서버 통신 오류가 발생했습니다.'}), 500
 
 
-# --- 3. 리포트 생성 함수 (/legal/report) ---
+# --- 3. 리포트 생성 함수 (/legal/report) --- (기존 유지)
 @bp.route('/report', methods=['GET'])
 def generate_report():
     user_id = session.get('user_id', 1)

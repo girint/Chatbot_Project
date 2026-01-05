@@ -67,9 +67,10 @@ def add_notice():
             notice_image=",".join(image_paths) or None
         )
         db.session.add(notice)
+        db.session.flush()
         db.session.commit()
 
-        return jsonify({"success": True, "notice": notice.to_dict()}), 201
+        return jsonify({"success": True, 'notice_id': notice.notice_id, "notice": notice.to_dict()}), 201
 
     except Exception as e:
         db.session.rollback()

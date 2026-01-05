@@ -1,42 +1,40 @@
 import "../../css/Notice.css";
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
 import { useState, useRef, useEffect } from 'react';
-import { Container, Form, Button, Row, Col, Image, Alert } from 'react-bootstrap';
+import { Container, Form, Button, Row, Col, Image, Alert, Modal } from 'react-bootstrap';
 import { create_notice } from '../../api/Notice_Api';
-import { AuthUtils } from '../../api/User_Api';
+import { TokenManager } from '../../api/User_Api';
+import { useNavigate } from 'react-router-dom';
 
 const NoticeWrite = () => {
-  // 기존 상태들
+  const navigate = useNavigate();
+
   const [files, setFiles] = useState([]);
   const [previewImages, setPreviewImages] = useState([]);
   const fileInputRef = useRef(null);
-
-  // 입력값 상태들
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
   const [price, setPrice] = useState('');
-
-  // 제출 상태
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
-  const [submitStatus, setSubmitStatus] = useState(''); // success/error
+  const [submitStatus, setSubmitStatus] = useState('');
 
-  // 이미지 핸들러들 (변경 없음)
+  // 팝업 상태 추가!
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [newNoticeId, setNewNoticeId] = useState(null);
+
+  // 이미지 핸들러
   const handleImageChange = (e) => {
-    const selectedFiles = Array.from(e.target.files || []);
-    setFiles(selectedFiles);
-    const urls = selectedFiles.map((file) => URL.createObjectURL(file));
-    setPreviewImages(urls);
-  };
-
+      const selectedFiles = Array.from(e.target.files || []);
+       setFiles(selectedFiles);
+        const urls = selectedFiles.map((file) => URL.createObjectURL(file));
+        setPreviewImages(urls);
+    };
   useEffect(() => {
     return () => {
-      previewImages.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [previewImages]);
-
+      previewImages.forEach((url) => URL.revokeObjectURL(url)); };
+    }, [previewImages]);
   const removeImage = (indexToRemove) => {
     URL.revokeObjectURL(previewImages[indexToRemove]);
     const nextFiles = files.filter((_, i) => i !== indexToRemove);
@@ -51,22 +49,19 @@ const NoticeWrite = () => {
       fileInputRef.current.files = dt.files;
     }
   };
-  // GPT
 
-
-  //완벽한 제출 핸들러 (로그인 검증 포함!)
+  //handleSubmit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 1. 기본 정보 입력되었는지 확인하기
     if (!title.trim() || !content.trim()) {
       setSubmitMessage('제목과 내용을 입력해주세요!');
       setSubmitStatus('error');
       return;
     }
 
-    //2. 토큰값있는지 확인하여 게시판 작성가능 여부 확인하기
-    if (!AuthUtils.isLoggedIn()) {
+    //TokenManager
+    if (!TokenManager.isLoggedIn()) {
       setSubmitMessage('로그인 후 이용해주세요!');
       setSubmitStatus('error');
       setTimeout(() => window.location.href = '/login', 1500);
@@ -77,7 +72,6 @@ const NoticeWrite = () => {
     setSubmitMessage('');
 
     try {
-      // 3. FormData 생성
       const formData = new FormData();
       formData.append('title', title);
       formData.append('content', content);
@@ -85,38 +79,26 @@ const NoticeWrite = () => {
       formData.append('price', price || 0);
       files.forEach((file) => formData.append('images', file));
 
-      // 4. API 호출
       const result = await create_notice(formData);
 
       if (result.success) {
-        // 성공!
-        setSubmitStatus('success');
-        setSubmitMessage('게시글이 성공적으로 등록되었습니다!');
+        //팝업 띄우기
+        setNewNoticeId(result.notice_id || result.data?.notice_id);
+        setShowSuccessModal(true);
 
-        // 입력값 초기화
+        //입력값 초기화
         setTitle('');
         setContent('');
         setTags('');
         setPrice('');
         setFiles([]);
         setPreviewImages([]);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
+        if (fileInputRef.current) fileInputRef.current.value = '';
       } else {
-        // 🔥 서버 에러별 처리
-        if (result.error?.includes('로그인') || result.error?.includes('토큰')) {
-          AuthUtils.logout();  // 토큰 무효화
-          setSubmitMessage('로그인 정보가 만료되었습니다. 다시 로그인해주세요.');
-          setTimeout(() => window.location.href = '/login', 1500);
-        } else {
-          setSubmitStatus('error');
-          setSubmitMessage(result.error || '등록에 실패했습니다.');
-        }
+        setSubmitStatus('error');
+        setSubmitMessage(result.error || '등록에 실패했습니다.');
       }
-
     } catch (error) {
-      console.error('제출 에러:', error);
       setSubmitStatus('error');
       setSubmitMessage(error.message || '등록에 실패했습니다.');
     } finally {
@@ -124,7 +106,6 @@ const NoticeWrite = () => {
     }
   };
 
-  // 취소 핸들러 (그대로!)
   const handleCancel = () => {
     if (window.confirm('작성을 취소하시겠습니까?')) {
       setTitle('');
@@ -140,18 +121,23 @@ const NoticeWrite = () => {
       setSubmitStatus('');
     }
   };
+  //팝업 핸들러 추가
+  const handleMyPosts = () => {
+    setShowSuccessModal(false);
+    navigate(`/notice/${newNoticeId}`);
+  };
+
+  const handleCloseModal = () => {
+    setShowSuccessModal(false);
+  };
 
   return (
     <div>
-      <Container
-        className="post-write-container NoticeWrite_all"
-        style={{ maxWidth: "900px", marginTop: "40px" }}
-      >
+      <Container className="post-write-container NoticeWrite_all" style={{ maxWidth: "900px", marginTop: "40px" }}>
         <div className="NW_title_box">
           <h4 className="NW_title">게시글 작성</h4>
         </div>
 
-        {/* 제출 메시지 */}
         {submitMessage && (
           <Alert
             variant={submitStatus === 'success' ? 'success' : 'danger'}
@@ -218,26 +204,74 @@ const NoticeWrite = () => {
           <div className="NW_tag_box">
             <Form.Group className="mb-3 NW-sub-title">
               <h6 className="NW-sub-h6">태그 입력</h6>
-              <Form.Control type="text" placeholder="# 태그 입력" className="NW-title-text" />
+              <Form.Control
+                type="text"
+                placeholder="# 태그 입력"
+                className="NW-title-text"
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+                disabled={isSubmitting}
+              />
             </Form.Group>
 
             <Form.Group className="mb-4 NW-sub-title">
               <h6 className="NW-sub-h6">가격 제시</h6>
-              <Form.Control type="number" placeholder="₩ 가격 입력" className="NW-title-text" />
+              <Form.Control
+                type="number"
+                placeholder="₩ 가격 입력"
+                className="NW-title-text"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                disabled={isSubmitting}
+              />
             </Form.Group>
           </div>
 
-          {/* 버튼들 */}
           <Row className="justify-content-end">
             <Col xs="auto">
-              <Button variant="success" className="NW_check_button" type="submit"><i className="fa-solid fa-check"></i>확인</Button>
+              <Button
+                variant="success"
+                className="NW_check_button"
+                type="submit"
+                disabled={isSubmitting}
+              >
+                <i className="fa-solid fa-check"></i>확인
+              </Button>
             </Col>
             <Col xs="auto">
-              <Button variant="secondary" className="NW_cancel_button" onClick={handleCancel}>취소</Button>
+              <Button
+                variant="secondary"
+                className="NW_cancel_button"
+                onClick={handleCancel}
+                disabled={isSubmitting}
+              >
+                취소
+              </Button>
             </Col>
           </Row>
         </Form>
       </Container>
+
+      {/*성공 팝업 추가! */}
+      <Modal show={showSuccessModal} onHide={handleCloseModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>게시글 등록 완료!</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          게시글이 성공적으로 등록되었습니다.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            닫기
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleMyPosts}
+          >
+            내 게시물로 이동
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

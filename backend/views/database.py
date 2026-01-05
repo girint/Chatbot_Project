@@ -1,6 +1,7 @@
 import sqlite3
 from pymongo import MongoClient
 import os
+from datetime import datetime # [신규 추가] 시간 저장을 위해 추가
 
 # --- [1] SQL 설정 (기본 정보 관리) ---
 def get_sql_conn():
@@ -39,3 +40,44 @@ def get_vector_collection():
         # 패키지가 없거나 모델 로드 실패 시 None 반환
         print(f"⚠️ [System] Vector DB 연결 실패 (건너뜀): {e}")
         return None
+
+
+def save_chat_to_mongo(user_id, category, user_msg, bot_msg):
+    """
+    사용자의 질문과 봇의 답변을 MongoDB에 카테고리별로 저장합니다.
+    """
+    db = get_mongo_db()
+    if db is None: return
+
+    chat_collection = db['chat_history']
+
+    # 해당 유저의 카테고리별 문서에 대화 내용 추가 ($push)
+    chat_collection.update_one(
+        {"user_id": user_id, "category": category},
+        {
+            "$push": {
+                "messages": {
+                    "$each": [
+                        {"role": "user", "content": user_msg, "timestamp": datetime.now()},
+                        {"role": "bot", "content": bot_msg, "timestamp": datetime.now()}
+                    ]
+                }
+            }
+        },
+        upsert=True  # 데이터가 없으면 새로 생성
+    )
+
+
+def get_chat_from_mongo(user_id, category):
+    """
+    MongoDB에서 특정 유저의 카테고리별 이전 대화 내역을 가져옵니다.
+    """
+    db = get_mongo_db()
+    if db is None: return []
+
+    chat_collection = db['chat_history']
+    history = chat_collection.find_one({"user_id": user_id, "category": category})
+
+    if history and "messages" in history:
+        return history["messages"]
+    return []

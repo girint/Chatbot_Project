@@ -1,49 +1,13 @@
 // src/api/Notice_Api.js
-import axios from 'axios';
-import { AuthUtils } from './User_Api';
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-
-// Axios 인스턴스 생성 (인터셉터 포함)
-const client = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true,
-});
-
-//토큰 처리 인터셉터
-client.interceptors.request.use((config) => {
-  const token = AuthUtils.getNickname() || localStorage.getItem('authToken');
-
-  if (token) {
-    const encodedToken = encodeURIComponent(token);
-    config.headers.Authorization = `Bearer ${encodedToken}`;
-    console.log(`🔐 NoticeApi 토큰: ${token} → ${encodedToken}`);
-  } else {
-    console.log('🔓 NoticeApi 토큰 없음');
-  }
-
-  return config;
-});
+import { protectedApi, TokenManager } from './User_Api';
 
 // ===== 1. 게시글 등록 =====
 export const create_notice = async (noticeData) => {
   try {
-    const token = localStorage.getItem('authToken');
-    console.log('🔍 Notice_Api 토큰:', token);
-
-    //로그인 체크
-    if (!token) {
-      console.log('❌ 토큰 없음 → 로그인 필요');
-      return {
-        success: false,
-        error: '로그인 후 이용해주세요.'
-      };
+    if (!TokenManager.isLoggedIn()) {
+      return { success: false, error: '로그인 후 이용해주세요.' };
     }
 
-    // 🔥 한글 토큰 URL 인코딩
-    const encodedToken = encodeURIComponent(token);
-
-    // FormData 자동 변환
     let formData;
     if (noticeData instanceof FormData) {
       formData = noticeData;
@@ -58,24 +22,11 @@ export const create_notice = async (noticeData) => {
       }
     }
 
-    // FormData 디버깅
-    console.log('📤 FormData 내용:');
-    for (let [key, value] of formData.entries()) {
-      console.log(`  ${key}:`, value);
-    }
+    const response = await protectedApi.post('/notices', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
 
-    const response = await axios.post(
-      `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/notices`,
-      formData,
-      {
-        headers: {
-          'Authorization': `Bearer ${encodedToken}`,
-          'Content-Type': 'multipart/form-data',
-        }
-      }
-    );
-
-    console.log('✅ 게시글 등록 성공:', response.data);
+    console.log('✅ 게시글 등록 성공:');
     return response.data;
 
   } catch (error) {
@@ -90,7 +41,7 @@ export const create_notice = async (noticeData) => {
 // ===== 2. 공지 상세 + 댓글 =====
 export const fetchNoticeDetail = async (noticeId) => {
   try {
-    const response = await client.get(`/notice/${noticeId}`);
+    const response = await protectedApi.get(`/notice/${noticeId}`);
     if (!response.data.success) {
       throw new Error(response.data.message || '공지 정보를 불러올 수 없습니다.');
     }
@@ -105,7 +56,7 @@ export const fetchNoticeDetail = async (noticeId) => {
 // ===== 3. 공지 좋아요 =====
 export const likeNotice = async (noticeId) => {
   try {
-    const response = await client.post(`/notice/${noticeId}/like`);
+    const response = await protectedApi.post(`/notice/${noticeId}/like`);
     if (!response.data.success) {
       throw new Error(response.data.message);
     }
@@ -120,7 +71,7 @@ export const likeNotice = async (noticeId) => {
 // ===== 4. 댓글 등록 =====
 export const createComment = async (noticeId, commentData) => {
   try {
-    const response = await client.post(`/notice/${noticeId}/comments`, commentData);
+    const response = await protectedApi.post(`/notice/${noticeId}/comments`, commentData);
     if (!response.data.success) {
       throw new Error(response.data.message);
     }
@@ -135,7 +86,7 @@ export const createComment = async (noticeId, commentData) => {
 // ===== 5. 공지 삭제 =====
 export const deleteNotice = async (noticeId) => {
   try {
-    const response = await client.delete(`/notice/${noticeId}`);
+    const response = await protectedApi.delete(`/notice/${noticeId}`);
     if (!response.data.success) {
       throw new Error(response.data.message);
     }
@@ -150,7 +101,7 @@ export const deleteNotice = async (noticeId) => {
 // ===== 6. 댓글 삭제 =====
 export const deleteComment = async (noticeId, commentId) => {
   try {
-    const response = await client.delete(`/notice/${noticeId}/comments/${commentId}`);
+    const response = await protectedApi.delete(`/notice/${noticeId}/comments/${commentId}`);
     if (!response.data.success) {
       throw new Error(response.data.message);
     }

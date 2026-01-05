@@ -17,6 +17,7 @@ from backend.views.notice import notice_bp
 from backend.views.ai_detail import ai_detail_bp
 from backend.views.main import main_bp
 from backend.views.mypage import mypage_bp
+from backend.views.chatlist import chatlist_bp
 
 # --- [ 챗봇 Blueprint import] ---
 from backend.views.Chatbot.wellness_views import bp as wellness_bp
@@ -89,6 +90,7 @@ def create_app():
     app.register_blueprint(ai_detail_bp, url_prefix="/api")
     app.register_blueprint(main_bp, url_prefix="/api")
     app.register_blueprint(mypage_bp, url_prefix="/api")
+    app.register_blueprint(chatlist_bp, url_prefix="/api")
 
     # 2. 8개 챗봇 기능 (각 파일에서 설정된 url_prefix가 적용됨)
     app.register_blueprint(wellness_bp)

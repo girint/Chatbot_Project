@@ -1,54 +1,158 @@
-import '../../css/ChatList.css'
-import {  useEffect, useRef, useState } from "react";
+// ChatList.jsx (메인)
+// - 왼쪽 목록 + 오른쪽 채팅 영역 레이아웃
+// - activeRoomId / messages를 localStorage에 저장해서 새로고침해도 유지
+// - 왼쪽 상단에 홈 버튼(메인 이동)
+
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ChatRoom from "./ChatRoom";
+import "../../css/ChatList.css";
 
 export default function ChatList() {
-    const topProfiles = [
-        { id:1, name: "웰니스 코치", img:"/img/chatlist2.png"},
-        { id:2, name: "커리어 멘토", img:"/img/chatlist2.png"},
-        { id:3, name: "금융 가이드", img:"/img/chatlist2.png"},
-        { id:4, name: "건강 매니저", img:"/img/chatlist2.png"},
-    ];
+  const navigate = useNavigate();
 
-    const rooms = [
-        {id:1, title:"웰니스 코치", preview:"사람들은 누구나 마음속에 마음의알을 가지고 태어난다."},
-        {id:2, title:"커리어 멘토", preview:"내 꿈은 해적왕."},
-        {id:3, title:"금융 가이드", preview:"인생 한방."},
-        {id:4, title:"건강 매니저", preview:"건강한 생활을 관리한다."},
-        {id:5, title:"데일리 도우미", preview:"오늘 집에가서 게임할거다."},
-        {id:6, title:"학습 서포터", preview:"공동묘지에 올라갔더니 시체가 벌떡."},
-        {id:7, title:"채팅방", preview:"..."},
-        {id:8, title:"쌓이면서", preview:"..."},
-        {id:9, title:"스크롤 생기는거", preview:"..."},
-        {id:10, title:"확인용", preview:"..."},
-    ];
+  // rooms는 변하지 않는 더미데이터(필요하면 API로 교체)
+  const rooms = useMemo(
+    () => [
+      { id: 1, title: "1번", preview: "이곳은 대화목록창입니다.", img: "/img/chatlist2.png" },
+      { id: 2, title: "2번", preview: "이곳은 대화목록창입니다2.", img: "/img/chatlist2.png" },
+      { id: 3, title: "3번", preview: "이곳은 대화목록창입니다3.", img: "/img/chatlist2.png" },
+      { id: 4, title: "4번", preview: "이곳은 대화목록창입니다4.", img: "/img/chatlist2.png" },
+      { id: 5, title: "5번", preview: "이곳은 대화목록창입니다5.", img: "/img/chatlist2.png" },
+      { id: 6, title: "6번", preview: "이곳은 대화목록창입니다6.", img: "/img/chatlist2.png" },
+    ],
+    []
+  );
 
-    return (
-        <div className='chatListPage'>
-            <div className='chatListShell'>
-                {/* 상단 프로필 고정 */}
-                <div className='chatTop'>
-                    <div className='topIcons'>
-                        {topProfiles.map((p) => (
-                            <button key={p.id} className='iconCircleBtn' type='button' title={p.name}>
-                                <img className='iconCircleImg' src={p.img} alt={p.name} />
-                            </button>
-                        ))}
-                    </div>
-                </div>
+  // 마지막 선택한 방 id 저장용 key
+  const ACTIVE_KEY = "chat_active_room_id";
+  // 메시지 저장용 key
+  const MSG_KEY = "chat_messages_v1";
 
-                {/* 목록 영역만 스크롤 */}
-                <div className='chatListBody'>
-                    {rooms.map((r) => (
-                        <div key={r.id} className='chatRoomRow'>
-                            <div className='chatAvatar' />
-                            <div className='chatRoomText'>
-                                <div className='chatRoomTitle'>{r.title}</div>
-                                <div className='chatRoomPreview'>{r.preview}</div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+  // 현재 선택된 방 id (localStorage에서 복구)
+  const [activeRoomId, setActiveRoomId] = useState(() => {
+    const saved = localStorage.getItem(ACTIVE_KEY);
+    return saved ? Number(saved) : null;
+  });
+
+  // 방별 메시지 저장 구조
+  const [messagesByRoom, setMessagesByRoom] = useState(() => {
+    try {
+      const saved = localStorage.getItem(MSG_KEY);
+      if (!saved) {
+        // 초기 더미 메시지 (원하면 삭제 가능)
+        return {
+          1: [
+            { id: 1, text: "안녕하세요, 여기는 대화창입니다.", me: false, createdAt: Date.now() - 60000 },
+            { id: 2, text: "1번 누르면 오른쪽 고정으로 보여요.", me: true, createdAt: Date.now() - 30000 },
+          ],
+        };
+      }
+      return JSON.parse(saved);
+    } catch (e) {
+      return {};
+    }
+  });
+
+  // activeRoomId가 바뀔 때마다 저장
+  useEffect(() => {
+    if (activeRoomId == null) localStorage.removeItem(ACTIVE_KEY);
+    else localStorage.setItem(ACTIVE_KEY, String(activeRoomId));
+  }, [activeRoomId]);
+
+  // messagesByRoom 바뀔 때마다 저장
+  useEffect(() => {
+    localStorage.setItem(MSG_KEY, JSON.stringify(messagesByRoom));
+  }, [messagesByRoom]);
+
+  // 현재 선택된 room 객체
+  const activeRoom = useMemo(() => rooms.find((r) => r.id === activeRoomId) || null, [rooms, activeRoomId]);
+
+  // 목록에서 보여줄 "마지막 메시지" (인스타/디스코드 느낌)
+  const getLastPreview = (room) => {
+    const list = messagesByRoom?.[room.id] || [];
+    const last = list[list.length - 1];
+    return last?.text ?? room.preview ?? "";
+  };
+
+  // 메시지 전송(오른쪽 ChatRoom에서 호출)
+  const handleSendMessage = (roomId, text) => {
+    const value = String(text || "").trim();
+    if (!value) return;
+
+    setMessagesByRoom((prev) => {
+      const next = { ...(prev || {}) };
+      const list = next[roomId] ? [...next[roomId]] : [];
+      list.push({
+        id: Date.now(), // 간단 id
+        text: value,
+        me: true,
+        createdAt: Date.now(),
+      });
+      next[roomId] = list;
+      return next;
+    });
+  };
+
+  return (
+    <div className="chatApp">
+      {/* 왼쪽 대화목록 */}
+      <aside className="chatSide">
+        <div className="chatTop">
+          {/* 상단: 홈 버튼 + 타이틀 */}
+          <div className="chatTopBar">
+            <button
+              type="button"
+              className="chatHomeBtn"
+              onClick={() => navigate("/")} // 메인 라우트로 이동 (너 프로젝트에 맞게 변경 가능)
+              title="메인으로"
+            >
+              ⟵
+            </button>
+            <div className="chatTopTitle">메시지</div>
+          </div>
         </div>
-    )
+
+        {/* 목록 많아지면 여기만 스크롤 */}
+        <div className="chatListBody">
+          {rooms.map((room) => (
+            <button
+              key={room.id}
+              type="button"
+              className={`chatRoomRow ${activeRoomId === room.id ? "active" : ""}`}
+              onClick={() => setActiveRoomId(room.id)}
+            >
+              {/* 사진(프로필) */}
+              {room.img ? (
+                <img className="chatAvatarImg" src={room.img} alt="" />
+              ) : (
+                <div className="chatAvatar" />
+              )}
+
+              <div className="chatRoomText">
+                <div className="chatRoomTitle">{room.title}</div>
+                <div className="chatRoomPreview">{getLastPreview(room)}</div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </aside>
+
+      {/* 오른쪽 채팅 / 빈 화면 */}
+      <main className="chatMain">
+        {!activeRoom ? (
+          <div className="chatEmpty">
+            <div className="chatEmptyTitle">목록을 선택해주세요.</div>
+            <div className="chatEmptyDesc">왼쪽 대화목록을 누르면 대화가 보여요.</div>
+          </div>
+        ) : (
+          <ChatRoom
+            room={activeRoom}
+            messages={messagesByRoom?.[activeRoom.id] || []}
+            onSend={(text) => handleSendMessage(activeRoom.id, text)}
+          />
+        )}
+      </main>
+    </div>
+  );
 }

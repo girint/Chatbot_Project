@@ -63,17 +63,15 @@ def get_main_summary():
     # 3. 로그인 사용자 확인 (토큰 있으면)
     auth_header = request.headers.get("Authorization")
     if auth_header and auth_header.startswith("Bearer "):
-        nickname = auth_header.replace("Bearer ", "")
+        nickname = auth_header.split(" ")[1]
         user = User.query.filter_by(
             user_nickname=nickname,
             user_delete=False
-        ).first()
+        ).first_or_404()
 
         if user:
             # 개인화 데이터 추가
-            response["user"] = {
-                "user_nickname": user.user_nickname,
-            }
+            response["user"] = {"user_nickname": user.user_nickname}
 
             # 나의 커스텀 AI (판매중)
             custom_ais = db.session.query(

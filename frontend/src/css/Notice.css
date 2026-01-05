@@ -1,6 +1,219 @@
 /* ---------------------------------------------- */
 /* 게시글 상세 페이지 */
 /* ---------------------------------------------- */
+/* 전체 배경 */
+.nd-page {min-height: 100vh;padding: 28px 12px;display: flex;justify-content: center;background: #fff;}
+
+/* 카드 (중앙 프레임) */
+.nd-card {width: min(720px, 100%);border: 1px solid #e7e7e7;border-radius: 10px;padding: 18px 18px 22px;background: #fff;}
+
+/* 제목 */
+.nd-title {margin: 0 0 10px; font-size: 32px;font-weight: 900;}
+
+/* 메타 + 좋아요 */
+.nd-metaRow {display: flex;align-items: center;justify-content: space-between;gap: 12px;flex-wrap: wrap;}
+
+.nd-metaLeft {display: flex;align-items: center;gap: 8px;color: #444;font-size: 13px;}
+
+.nd-author {font-weight: 700;}
+.nd-date {color: #444;}
+.nd-views {color: #444;}
+
+.nd-likeBtn {border: 1px solid #d8d8d8;background: #fff;padding: 7px 12px;border-radius: 8px;font-size: 13px;cursor: pointer;}
+.nd-likeBtn:hover {background: #f7f7f7;}
+
+/* 구분선 */
+.nd-divider {height: 1px;background:#e7e7e7;margin: 14px 0;}
+
+/* 본문 */
+.nd-body {font-size: 14px;color: #222;}
+.nd-bodyLine {margin: 0 0 8px;line-height: 1.6;white-space: pre-wrap;}
+
+.nd-imageWrap {margin-top: 10px;display: flex;justify-content: center;}
+.nd-image {width: 100%; max-height: 340px;object-fit: cover;border-radius: 8px;border: 1px solid #eee;}
+
+/* 하단 (이전&다음 버튼) */
+.nd-navRow {display: flex;align-items: center;justify-content: space-between;gap: 12px;flex-wrap: wrap;margin-top: 15px;}
+
+.nd-prevNext {display: flex;gap: 14px;align-items: center;}
+
+/* 이전글/다음글2 */
+.nd-navBtn {border: 0;background: transparent;padding: 0;font-size: 14px;color: #111;cursor: pointer;}
+.nd-navBtn:hover {text-decoration: underline;}
+.nd-navBtn:disabled {color: #dbdbdb;cursor: not-allowed;text-decoration: none;}
+
+.nd-linkBtn {border: 0;background: transparent;color: #111;cursor: pointer;font-size: 13px;padding: 6px 2px;}
+.nd-linkBtn:disabled {color: #bbb;cursor: not-allowed;}
+
+.nd-actions {display: flex;gap: 10px;}
+
+.nd-actionBtn {border: 1px solid #cfcfcf;background: #fff;color: #111;padding: 7px 14px;border-radius: 6px;font-size: 13px;cursor: pointer;} 
+.nd-actionBtn.nd-edit {background: #2f2f2f;border-color: #2f2f2f;color: #fff;}
+.nd-actionBtn.nd-del {background: #e53935;border-color: #e53935;color: #fff;}
+
+/* 댓글 */
+.nd-comments {margin-top: 6px;}
+
+.nd-commentsHeader {font-size: 18px;font-weight: 900;margin: 0 0 10px;}
+
+/* 댓글 리스트 */
+.nd-commentList {list-style: none;padding: 0;margin: 0;display: flex;flex-direction: column;gap: 12px;}
+
+.nd-commentItem {border-top: 1px dashed #e8e8e8;padding-top:12px ;}
+
+.nd-commentTop {display: flex;align-items: center;justify-content: space-between;gap: 10px;}
+
+.nd-commentMeta {display: flex;align-items: baseline;gap: 10px;}
+
+.nd-commentAuthor {font-size: 14px;font-weight: 700;}
+.nd-commentDate {font-size: 12px;color: #777;}
+
+.nd-commentBody {margin-top: 6px;font-size: 14px;color: #222;line-height: 1.6; display: flex; justify-content: space-between;}
+
+.nd-commentDelete {background: #e53935;border-color: #e53935;color: #fff; border: 1px solid; border-radius: 6px; font-size: 13px;}
+
+/* 댓글 하트 */
+.nd-heartBtn {border: 0;background: transparent;font-size: 18px;line-height: 1;cursor: pointer;color:#e53935;padding: 4px 6px;}
+
+/* 댓글 작성 폼 */
+.nd-commentForm {margin-top: 14px;border-top: 1px solid #e0e0e0;padding-top: 12px;background: #fff;}
+
+.nd-commentBox {display: flex;flex-direction: column;gap: 10px;}
+
+.nd-commentInput {width: 100%;min-height: 90px;border: 1px solid #dcdcdc;border-radius: 4px; outline: none;padding: 10px;font-size: 14px;resize: none;transition: border-color 0.2s, box-shadow 0.2s;}
+
+/* 클릭 시 색상 변환 */
+.nd-commentInput:focus {border-color: #4a6cf7;box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.15);}
+
+/* 등록버튼 */
+.nd-commentAction {display: flex;justify-content: flex-end;}
+
+.nd-commentSubmit {border: 1px solid #cfcfcf;background: #f3f3f3;color: #111;border-radius: 4px;padding: 6px 16px;font-size: 13px;cursor: pointer;}
+
+.nd-commentSubmit:hover {background: #eaeaea;}
+
+/* 반응형(768px이하 태블릿/작은 노트북) */
+@media (max-width: 768px) {
+    .nd-page {
+        padding: 18px 10px;
+    }
+
+    .nd-card {
+        padding: 16px 14px 18px;
+        border-radius: 10px;
+    }
+
+    .nd-title {
+        font-size: 24px;
+        line-height: 1.25;
+    }
+
+    .nd-metaRow {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .nd-metaLeft {
+        flex-wrap: wrap;
+        gap: 6px 10px;
+    }
+
+    .nd-likeBtn {
+        padding: 7px 10px;
+    }
+
+    .md-image {
+        max-height: 260px;
+    }
+
+    .nd-navRow {
+        gap: 10px;
+    }
+
+    .nd-prevNext {
+        gap: 10px;
+    }
+
+    .nd-actions {
+        gap: 8px;
+    }
+
+    .nd-actionBtn {
+        padding: 7px 12px;
+    }
+}
+
+/* 반응형(480px 이하 모바일) */
+@media (max-width: 480px) {
+    .nd-page {
+        padding: 14px 8px;
+    }
+
+    .nd-card {
+        padding: 14px 12px 16px;
+        border-radius: 8px;
+    }
+
+    .nd-title {
+        font-size: 20px;
+    }
+
+    .nd-body {
+        font-size: 13.5px;
+    }
+
+    .nd-bodyLine {
+        line-height: 1.7;
+    }
+
+    .nd-image {
+        max-height: 220px;
+    }
+
+    /* 메타/좋아요 세로모드 */
+    .nd-metaRow {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nd-likeBtn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* 이전/다음/수정/삭제 줄바꿈 자연스럽게 */
+    .nd-navRow {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .nd-prevNext {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .nd-actions {
+        width: 100%;
+    }
+
+    .nd-actionBtn {
+        flex: 1;
+        width: 100%;
+    }
+
+    /* 댓글 */
+    .nd-commentsHeader {
+        font-size: 16px;
+    }
+
+    .nd-commentAuthor {
+        font-size: 13.5px;
+    }
+
+    .nd-commentBody {
+        font-size:13.5px;
+    }
+}
 
 
 
