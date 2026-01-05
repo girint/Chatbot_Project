@@ -2,10 +2,9 @@
 
 import React,{ useEffect, useState } from 'react'
 import { Container, Row, Col, Image, Form, InputGroup, Button } from 'react-bootstrap';
-import { updateProfile } from '../../api/Mypage_Api';
 import  { TokenManager }  from '../../api/User_Api';
 import '../../css/User.css'
-import { getMyProfile,delete_user } from '../../api/Mypage_Api';
+import { getMyProfile,delete_user, updateProfile } from '../../api/Mypage_Api';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -116,6 +115,7 @@ const Mypage = () => {
   fetchProfile();
 }, []);
 //
+
 if (loading) {
   return (
     <Container className="text-center mt-5">

@@ -13,7 +13,7 @@ from backend.views.database import save_chat_to_mongo, get_chat_from_mongo
 load_dotenv()
 
 # 블루프린트 생성
-bp = Blueprint('learning_chat', __name__, url_prefix='/learning')
+bp = Blueprint('learning_chat', __name__, url_prefix='/api/learning')
 
 # --- 챗봇 환경 설정 ---
 USER_NAME = "자유로움"

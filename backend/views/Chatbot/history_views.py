@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, session, jsonify
 from backend.models import db, ChatLog
 from backend.views.database import get_mongo_db
 
-bp = Blueprint('history', __name__, url_prefix='/history')
+bp = Blueprint('history', __name__, url_prefix='/api/history')
 
 
 @bp.route('/')

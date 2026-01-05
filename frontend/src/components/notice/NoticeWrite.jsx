@@ -133,7 +133,7 @@ const NoticeWrite = () => {
 
   return (
     <div>
-      <Container className="post-write-container NoticeWrite_all" style={{ maxWidth: "900px", marginTop: "40px" }}>
+      <Container className="post-write-container NoticeWrite_all" style={{ maxWidth: "900px", marginTop: "80px" }}>
         <div className="NW_title_box">
           <h4 className="NW_title">게시글 작성</h4>
         </div>

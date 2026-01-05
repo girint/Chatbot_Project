@@ -186,7 +186,9 @@ export default function NoticeDetail() {
           </div>
           {isOwner && (
           <div className="nd-actions">
-            <button className="nd-actionBtn nd-edit" onClick={() => navigate(`/notice/edit/${state.noticeData.notice_id}`)}>
+            <button className="nd-actionBtn nd-edit" 
+            // onClick={() => navigate(`/notice/edit/${state.noticeData.notice_id}`)}
+            >
               수정
             </button>
             <button className="nd-actionBtn nd-del" onClick={onClickDelete}>삭제</button>

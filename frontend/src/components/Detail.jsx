@@ -5,7 +5,6 @@ import * as Api from '../api/AI_Detail_Api.js';
 
 export default function Detail() {  // props로 aiId 받기
     const { aiId } = useParams();
-    console.log('🔍 useParams aiId:', aiId);
     const [aiData, setAiData] = useState(null);
     const [reviews, setReviews] = useState([]);
     const [newReview, setNewReview] = useState('');
@@ -15,9 +14,11 @@ export default function Detail() {  // props로 aiId 받기
     const [hasReview, setHasReview] = useState(false);
     const [hasUsedAi, setHasUsedAi] = useState(false);
     const [aiDetail, setAiDetail] = useState(null);
+    const [usageInfo, setUsageInfo] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
+        console.log('🔍 useParams aiId:', aiId);
         fetchDetail();
     }, [aiId]);
 
@@ -32,6 +33,7 @@ export default function Detail() {  // props로 aiId 받기
             setIsLoggedIn(data.is_logged_in);
             setHasReview(data.has_review);
             setHasUsedAi(data.has_used_ai);
+            setUsageInfo(data.usage_info);
 
             setLoading(false);
         } catch (error) {
@@ -49,6 +51,7 @@ export default function Detail() {  // props로 aiId 받기
             setReviews([newReviewData, ...reviews]);
             setNewReview('');
             setCanWrite(false);
+            await fetchDetail();
         } catch (error) {
             alert(error.message);
         }
@@ -99,9 +102,14 @@ export default function Detail() {  // props로 aiId 받기
                                     <div className="wf-name">{r.user_nickname}</div>
                                     <div className="wf-comment">
                                         {r.review_write}
-                                        <button className="wf-CommentDelete" onClick={() => handleDeleteReview(r.review_id)}>
-                                            리뷰 삭제
-                                        </button>
+                                        {r.user_nickname === localStorage.getItem("authToken") && (
+                                            <button
+                                                className="wf-CommentDelete"
+                                                onClick={() => handleDeleteReview(r.review_id)}
+                                            >
+                                                리뷰 삭제
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -133,17 +141,44 @@ export default function Detail() {  // props로 aiId 받기
 
                 <section className="wf-bottom">
                     <div className="wf-wrap">
-                        <button className="write-btn" onClick={() => {
-                            const token = localStorage.getItem("authToken");
-                            if (!token) {
-                                alert("로그인 후 이용이 가능합니다.");
-                                navigate("/login"); // 로그인 페이지로 이동
-                                return;
-                            }
-                            navigate(`/${aiData.ai_content}`);
-                        }}>
-                            대화 시작하기 (₩{aiData.ai_price})
-                        </button>
+                        {hasUsedAi ? (
+                            <button
+                                className="write-btn"
+                                onClick={() => {
+                                    const token = localStorage.getItem("authToken");
+                                    if (!token) {
+                                        alert("로그인 후 이용 가능합니다.");
+                                        navigate("/login");
+                                        return;
+                                    }
+                                    navigate(`/${aiData.ai_content}`);  // 챗봇 페이지
+                                }}
+                            >
+                                계속 대화하기
+                            </button>
+                        ) : usageInfo?.has_free_usage ? (
+                            <button
+                                className="write-btn"
+                                onClick={() => {
+                                    const token = localStorage.getItem("authToken");
+                                    if (!token) {
+                                        alert("로그인 후 무료 사용 가능합니다.");
+                                        navigate("/login");
+                                        return;
+                                    }
+                                    navigate(`/${aiData.ai_content}`);
+                                }}
+                            >
+                                무료 사용 시작하기 ({usageInfo.used_count}/3)
+                            </button>
+                        ) : (
+                            <button
+                                className="write-btn"
+                                onClick={() => navigate('/payment')}  // 결제 페이지
+                            >
+                                결제하기 (₩{aiData.ai_price})
+                            </button>
+                        )}
                     </div>
                 </section>
             </div>

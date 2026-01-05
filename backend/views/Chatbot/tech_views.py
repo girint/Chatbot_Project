@@ -14,7 +14,7 @@ from backend.views.database import save_chat_to_mongo, get_chat_from_mongo
 load_dotenv()
 
 # 블루프린트 설정
-bp = Blueprint('tech_chat', __name__, url_prefix='/tech')
+bp = Blueprint('tech_chat', __name__, url_prefix='/api/tech')
 
 # --- 챗봇 환경 설정 ---
 CHAT_TITLE = "AI 및 기술 활용 가이드 멘토"

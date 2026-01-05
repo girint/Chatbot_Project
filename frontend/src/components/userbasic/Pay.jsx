@@ -73,7 +73,10 @@ export default function PaymentMethodSelect({ value, onChange, defaultValue = "C
     };
 
 
-    
+    //충전금액 확인
+    const [currentCoin] = useState(1000); // 예시: 서버/props로 받으면 더 좋음
+    const [chargeCoin, setChargeCoin] = useState(1000); // 기본 선택
+    const totalCoin = currentCoin + chargeCoin;
 
 
     return (
