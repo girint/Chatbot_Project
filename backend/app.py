@@ -1,5 +1,6 @@
-# backend/app.py
-from flask import Flask
+# backend/app.py (완전체 - 에러 핸들러 추가)
+
+from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_migrate import Migrate
 import os
@@ -8,9 +9,9 @@ from dotenv import load_dotenv
 # --- [DB 관련 라이브러리 추가] ---
 from pymongo import MongoClient
 import chromadb
-from chromadb.utils import embedding_functions  # 임베딩 함수 추가
+from chromadb.utils import embedding_functions
 
-# --- [ 기본 Blueprint import] ---
+# --- [기본 Blueprint import] ---
 from backend.models import db
 from backend.views.user import user_bp
 from backend.views.notice import notice_bp
@@ -19,7 +20,7 @@ from backend.views.main import main_bp
 from backend.views.mypage import mypage_bp
 from backend.views.chatlist import chatlist_bp
 
-# --- [ 챗봇 Blueprint import] ---
+# --- [챗봇 Blueprint import] ---
 from backend.views.Chatbot.wellness_views import bp as wellness_bp
 from backend.views.Chatbot.career_views import bp as career_bp
 from backend.views.Chatbot.daily_views import bp as daily_bp
@@ -31,60 +32,64 @@ from backend.views.Chatbot.tech_views import bp as tech_bp
 from backend.views.Chatbot.history_views import bp as history_bp
 
 def create_app():
-    load_dotenv() #.env파일 세팅
+    load_dotenv()
     app = Flask(__name__)
 
-    # CORS 설정: React(3000)와 통신 허용
-    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
-    #CORS(app)
+    # CORS 설정
+    CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://localhost:5000"]}}, supports_credentials=True)
 
-    # 1. SQLAlchemy(SQLite) 설정
+    # SQLAlchemy 설정
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///AI.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY", "your-secret-key")
 
-    # 2. MongoDB 초기화 (is not None 체크를 위해 안전하게 연결)
+    # MongoDB 초기화
     try:
-        # .env 파일에서 MONGO_URI를 읽어옵니다.
-        # (만약 .env에 주소가 없다면 로컬 호스트를 기본으로 사용하도록 안전장치를 둡니다)
         mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
-
         mongo_client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
-
-        # chatbot_master DB 연결
         app.mongodb = mongo_client["chatbot_master"]
-        # 연결 확인
         mongo_client.server_info()
         print("[SUCCESS] MongoDB Connected: 'chatbot_master'")
     except Exception as e:
         print(f"[ERROR] MongoDB Connection Failed: {e}")
         app.mongodb = None
 
-    # 3. Vector DB(ChromaDB) 초기화 (Embedding Function 필수 설정)
+    # Vector DB 초기화
     try:
         persist_dir = os.path.join(os.getcwd(), "chroma_db")
         chroma_client = chromadb.PersistentClient(path=persist_dir)
-
-        # 텍스트를 벡터로 자동 변환해주는 기본 임베딩 함수 설정
-        # (이 설정을 해야 .add() 호출 시 텍스트만 넣어도 저장이 됩니다)
         default_ef = embedding_functions.DefaultEmbeddingFunction()
-
-        # 컬렉션 생성 및 할당
         app.vector_db = chroma_client.get_or_create_collection(
             name="chatbot_history",
             embedding_function=default_ef
         )
-        print("[SUCCESS] Vector DB Initialized with Embedding Function")
+        print("[SUCCESS] Vector DB Initialized")
     except Exception as e:
-        print(f"[ERROR] Vector DB Initialization Failed: {e}")
+        print(f"[ERROR] Vector DB Failed: {e}")
         app.vector_db = None
 
     # DB 초기화
     db.init_app(app)
     Migrate(app, db)
 
-    # --- [블루프린트 등록] ---
-    # 1. 기존 프로젝트 기능
+    # 🔥 500 에러에도 CORS 헤더 추가 (핵심!)
+    @app.errorhandler(500)
+    def internal_error(error):
+        response = jsonify({'error': 'Internal server error'})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Authorization,Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+        return response, 500
+
+    # 모든 응답에 CORS 헤더
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+        response.headers.add('Access-Control-Allow-Headers', 'Authorization,Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+        return response
+
+    # Blueprint 등록
     app.register_blueprint(user_bp, url_prefix="/api")
     app.register_blueprint(notice_bp, url_prefix="/api")
     app.register_blueprint(ai_detail_bp, url_prefix="/api")
@@ -92,10 +97,9 @@ def create_app():
     app.register_blueprint(mypage_bp, url_prefix="/api")
     app.register_blueprint(chatlist_bp, url_prefix="/api")
 
-    # 2. 8개 챗봇 기능 (각 파일에서 설정된 url_prefix가 적용됨)
     app.register_blueprint(wellness_bp)
-    app.register_blueprint(career_bp)
-    app.register_blueprint(daily_bp)
+    app.register_blueprint(career_bp, url_prefix="/api")
+    app.register_blueprint(daily_bp, url_prefix="/api")
     app.register_blueprint(finance_bp)
     app.register_blueprint(health_bp)
     app.register_blueprint(learning_bp)
@@ -105,16 +109,9 @@ def create_app():
 
     return app
 
-
 app = create_app()
 
 if __name__ == "__main__":
     with app.app_context():
-        # SQLite 테이블 생성
         db.create_all()
-
-    # host="0.0.0.0"으로 설정하여 외부 접속 허용, debug=True로 자동 재시작 활성화
-    try:
-        app.run(host="0.0.0.0", port=5000, debug=True)
-    except KeyboardInterrupt:
-        print("Server stopped by user.")
+    app.run(host="0.0.0.0", port=5000, debug=True)

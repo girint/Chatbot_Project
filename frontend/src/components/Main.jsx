@@ -158,7 +158,7 @@ const AIIntroduce = () => {
                             </div>
                         ) :
                             basicAI_Data.slice(0, 8).map((item, index) => (  
-                                <Col key={item.name || index} xs={6} md={6} className="AICategory_circle" onClick={() => navigate(`/api/ai/${item.id}`)}>
+                                <Col key={item.name || index} xs={6} md={6} className="AICategory_circle" onClick={() => navigate(`/ai/${item.id}`)}>
                                     <div className="circle_div">
                                         <Image
                                             src={item.image || `/img/default-category-${index + 1}.png`}

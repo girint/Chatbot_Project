@@ -1,7 +1,7 @@
 // AI_Detail_Api.js
 import { protectedApi, TokenManager } from './User_Api';
 
-const API_BASE = '/api';
+
 
 //ai정보 조회 Api
 export const fetchAiDetail = async (aiId) => {

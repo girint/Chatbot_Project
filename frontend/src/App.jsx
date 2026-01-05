@@ -52,7 +52,7 @@ function App() {
                 <Route path="/Mypage" element={<Mypage />} />
                 <Route path="/Pay" element={<Pay />} />
             {/*  <Route path='/Detail' element={<Detail />} /> */}
-                <Route path="/api/ai/:aiId" element={<Detail />} />
+                <Route path="/ai/:aiId" element={<Detail />} />
                 <Route path='/ErrorPage' element={<ErrorPage />} />
                 <Route path='/NoticeWrite' element={<NoticeWrite />} />
                 <Route path="/notice/:noticeId" element={<NoticeDetail />} />

@@ -1,26 +1,47 @@
 import certifi
 import httpx
 import os
-import json
-from flask import Blueprint, render_template, request, jsonify, session, current_app
+from flask import Blueprint,request, jsonify, session, current_app
 from openai import OpenAI
 from dotenv import load_dotenv
+from backend.models import db, ChatLog, UseBox,User
 from datetime import datetime, timezone
-# --- [신규 추가] database.py의 함수 임포트 ---
-
-from backend.models import db, ChatLog, UseBox
 from backend.views.database import save_chat_to_mongo, get_chat_from_mongo
+from functools import wraps
+import urllib
 
+#------------------------------------------------
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth_header = request.headers.get('Authorization') or request.headers.get('authorization')
+
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'error': '토큰 필요'}), 401
+
+        token = auth_header.split('Bearer ')[1].strip()
+        token = urllib.parse.unquote(token)  # 한글 복원
+
+        user = User.query.filter_by(user_nickname=token).first()
+        if not user:
+            return jsonify({'error': '유저 없음'}), 401
+
+        session['user_id'] = user.user_id
+        session['user_name'] = user.user_nickname# 👈 Flask 세션에도 저장 (옵션)
+        return f(user=user, *args, **kwargs)  # 사용자 정보 전달
+
+    return decorated
+#------------------------------------------------
 load_dotenv()
 
 # 블루프린트 생성
-bp = Blueprint('career_chat', __name__, url_prefix='/api/career')
+bp = Blueprint('career_chat', __name__)
 
 # --- 챗봇 환경 설정 ---
 DEFAULT_NAME = "사용자"
 CHAT_TITLE = "커리어 개발 및 취업 준비 챗봇"
 
-# SYSTEM_PROMPT (기존 내용 100% 유지)
+# 시스템 페르소나 설정
 SYSTEM_PROMPT = """
 당신은 사용자의 경력 발전과 성공적인 취업을 위한 실질적인 정보와 전략을 제공하는 '스마트하고 전략적인 커리어 멘토' 챗봇입니다.
 사용자 이름: {user_name}
@@ -46,7 +67,7 @@ SYSTEM_PROMPT = """
 - 추상적인 조언보다는 '지금 당장 해야 할 일' 위주로 구체적으로 작성하세요.
 """
 
-# OpenAI 클라이언트 초기화 (기존 유지)
+# OpenAI 클라이언트 초기화
 client = None
 try:
     api_key = os.environ.get("OPENAI_API_KEY")
@@ -56,20 +77,23 @@ try:
             http_client=httpx.Client(verify=certifi.where())
         )
 except Exception as e:
-    print(f"[Career] OpenAI Init Error: {e}")
+    print(f"[career] OpenAI Init Error: {e}")
 
 
-# --- 1. 초기 안내 프롬프트 제공 (/career/) ---
-@bp.route('/')
-def chat_usage():
-    user_name = session.get('user_nickname') or session.get('user_name') or DEFAULT_NAME
+# --- 초기 안내 데이터 제공 ---
+@bp.route('/career', strict_slashes=False)
+@token_required
+def chat_usage(user):
+    user_name = session.get('user_nickname') or session.get('nickname') or session.get('user_name') or session.get('name') or DEFAULT_NAME
     user_id = session.get('user_id')
 
-    # [수정 부분] 기존 커리어 상담 내역이 있는지 확인하여 가져옴
+    #기존 일상 상담 내역이 있는지 확인하여 가져옴
     history = []
     if user_id:
-        # 카테고리를 'career'로 지정하여 MongoDB 기록 조회
-        history = get_chat_from_mongo(user_id, "career")
+        try:
+            history = get_chat_from_mongo(user_id, "career")
+        except:
+            pass
 
     chat_intro_html = f"""
     <div class="initial-text" style="margin-top: 5px;">
@@ -90,21 +114,23 @@ def chat_usage():
     <p style="margin-top: 10px;">자, 이제 <b>{user_name}님</b>의 커리어 고민을 들려주세요. 제가 함께 전략을 세워보겠습니다!</p>
     """
 
+
     return jsonify({
         "status": "success",
         "user_name": user_name,
         "is_logged_in": bool(user_id),
         "chat_title": CHAT_TITLE,
         "intro_html": chat_intro_html,
-        "history": history  # [신규 추가] 기존 대화 내역 전달
+        "history": history
     })
 
 
-# --- 2. 질문 처리 및 하이브리드 저장 (/career/ask) ---
-@bp.route('/ask', methods=['POST'])
-def ask():
+# ---API 호출 및 하이브리드 저장---
+@bp.route('/career/ask', methods=['POST'])
+@token_required
+def ask(user):
     if client is None:
-        return jsonify({'response': 'OpenAI API Key is missing.'}), 500
+        return jsonify({'response': 'Error: OpenAI API Key missing.'}), 500
 
     current_user_id = session.get('user_id', 1)
     user_name = session.get('user_nickname') or session.get('user_name') or DEFAULT_NAME
@@ -129,7 +155,7 @@ def ask():
 
         ai_response = response.choices[0].message.content.strip()
 
-        # --- 저장 로직 ---
+        # --- 하이브리드 저장 로직 ---
         try:
             CAREER_AI_ID = 2
             usebox = UseBox.query.filter_by(user_id=current_user_id, ai_id=CAREER_AI_ID).first()
@@ -149,7 +175,6 @@ def ask():
             db.session.commit()
             sql_id = new_log.id
 
-            # 기존 MongoDB Atlas 저장 (기존 유지)
             mongodb = getattr(current_app, 'mongodb', None)
             if mongodb is not None:
                 try:
@@ -163,13 +188,11 @@ def ask():
                         "timestamp": datetime.now(timezone.utc)
                     })
                 except Exception as mongo_err:
-                    print(f"[Career Mongo Error] {mongo_err}")
+                    print(f"[career Mongo Error] {mongo_err}")
 
             # [신규 추가] 히스토리 유지를 위한 MongoDB 공통 함수 호출
-            # category를 'career'로 지정하여 저장합니다.
             save_chat_to_mongo(current_user_id, "career", user_message, ai_response)
 
-            # Vector DB 저장 (기존 유지)
             vector_db = getattr(current_app, 'vector_db', None)
             if vector_db is not None:
                 try:
@@ -179,22 +202,23 @@ def ask():
                         metadatas=[{"user_id": current_user_id, "category": "career"}]
                     )
                 except Exception as vec_err:
-                    print(f"[Career Vector Error] {vec_err}")
+                    print(f"[career Vector Error] {vec_err}")
 
         except Exception as db_err:
             db.session.rollback()
-            print(f"[Career Storage Error] {db_err}")
+            print(f"[career Storage Error] {db_err}")
 
         return jsonify({'status': 'success', 'response': ai_response})
 
     except Exception as e:
-        print(f"[Career API Error] {e}")
+        print(f"[career API Error] {e}")
         return jsonify({'response': '서버 통신 오류가 발생했습니다.'}), 500
 
 
-# --- 3. 리포트 생성 (/career/report) --- (기존 유지)
-@bp.route('/report', methods=['GET'])
-def generate_report():
+# --- 리포트 생성 함수 --
+@bp.route('/career/report', methods=['GET'])
+@token_required
+def generate_report(user):
     user_id = session.get('user_id', 1)
     user_name = session.get('user_nickname') or session.get('user_name') or DEFAULT_NAME
 
@@ -205,15 +229,14 @@ def generate_report():
         ).order_by(ChatLog.created_at.desc()).limit(5).all()
 
         if not history:
-            return jsonify({'error': '상담 내역이 부족합니다.'}), 404
+            return jsonify({'error': '분석할 상담 내역이 부족합니다.'}), 404
 
         chat_data = "\n".join([f"Q: {h.question}\nA: {h.answer}" for h in reversed(history)])
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system",
-                 "content": f"당신은 커리어 컨설팅 전문가입니다. {user_name}님의 상담 내용을 분석하여 역량 강점과 향후 실행 과제를 요약한 리포트를 마크다운 형식으로 작성하세요."},
+                {"role": "system", "content": f"당신은 커리어 컨설팅 전문가입니다. {user_name}님의 상담 내용을 분석하여 역량 강점과 향후 실행 과제를 요약한 리포트를 마크다운 형식으로 작성하세요."},
                 {"role": "user", "content": f"{user_name}님의 커리어 상담 분석 리포트 작성:\n\n{chat_data}"}
             ]
         )
@@ -221,5 +244,5 @@ def generate_report():
         return jsonify({'status': 'success', 'report': response.choices[0].message.content})
 
     except Exception as e:
-        print(f"[Career Report Error] {e}")
+        print(f"[Daily Report Error] {e}")
         return jsonify({'error': '리포트 생성 중 오류가 발생했습니다.'}), 500

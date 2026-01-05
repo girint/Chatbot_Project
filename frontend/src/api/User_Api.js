@@ -40,7 +40,7 @@ export const TokenManager = {
 
 // 인터셉터 실제 구헌 함수
 protectedApi.interceptors.request.use(config => {
-  const token = TokenManager.getNickname();
+  const token = localStorage.getItem('authToken');
   if (token) {
     config.headers.Authorization = `Bearer ${encodeURIComponent(token)}`;
   }

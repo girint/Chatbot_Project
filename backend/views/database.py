@@ -18,7 +18,7 @@ def get_mongo_db():
         client.admin.command('ping')
         return client['chatbot_master']
     except Exception as e:
-        print(f"⚠️ [System] MongoDB 연결 실패: {e}")
+        print(f" [System] MongoDB 연결 실패: {e}")
         return None
 
 # --- [3] Vector DB 설정 (ChromaDB) ---
@@ -38,7 +38,7 @@ def get_vector_collection():
         return client.get_or_create_collection(name="user_chats", embedding_function=ef)
     except Exception as e:
         # 패키지가 없거나 모델 로드 실패 시 None 반환
-        print(f"⚠️ [System] Vector DB 연결 실패 (건너뜀): {e}")
+        print(f" [System] Vector DB 연결 실패 (건너뜀): {e}")
         return None
 
 

@@ -1,25 +1,47 @@
 import certifi
 import httpx
 import os
-import json
-from flask import Blueprint, render_template, request, jsonify, session, current_app
+from flask import Blueprint,request, jsonify, session, current_app
 from openai import OpenAI
 from dotenv import load_dotenv
-from backend.models import db, ChatLog, UseBox
+from backend.models import db, ChatLog, UseBox,User
 from datetime import datetime, timezone
-# --- [신규 추가] database.py의 함수 임포트 ---
 from backend.views.database import save_chat_to_mongo, get_chat_from_mongo
+from functools import wraps
+import urllib
 
+#------------------------------------------------
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth_header = request.headers.get('Authorization') or request.headers.get('authorization')
+
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'error': '토큰 필요'}), 401
+
+        token = auth_header.split('Bearer ')[1].strip()
+        token = urllib.parse.unquote(token)  # 한글 복원
+
+        user = User.query.filter_by(user_nickname=token).first()
+        if not user:
+            return jsonify({'error': '유저 없음'}), 401
+
+        session['user_id'] = user.user_id
+        session['user_name'] = user.user_nickname# 👈 Flask 세션에도 저장 (옵션)
+        return f(user=user, *args, **kwargs)  # 사용자 정보 전달
+
+    return decorated
+#------------------------------------------------
 load_dotenv()
 
 # 블루프린트 생성
-bp = Blueprint('daily_chat', __name__, url_prefix='/api/daily')
+bp = Blueprint('daily_chat', __name__)
 
 # --- 챗봇 환경 설정 ---
 DEFAULT_NAME = "사용자"
 CHAT_TITLE = "일상생활 문제 해결 챗봇"
 
-# 시스템 페르소나 설정 (기존 내용 유지)
+# 시스템 페르소나 설정
 SYSTEM_PROMPT = """
 당신은 요리 레시피부터 가전제품 사용법, 육아 및 반려동물 돌봄 노하우, 주택 관리 팁, 특정 지역의 생활 정보까지, 일상에서 마주하는 다양한 문제들을 해결해 드리는 '친절하고 만능인 생활 도우미' 챗봇입니다.
 사용자 이름: {user_name}
@@ -47,7 +69,7 @@ SYSTEM_PROMPT = """
 7. 면책 조항: 답변의 마지막에 "⭐ 중요: 이 챗봇은 생활 정보를 제공하지만, 전문적인 진단이나 수리, 안전에 직결되는 기술적인 조언을 직접 대체할 수 없습니다. 중요한 문제에 대해서는 해당 분야의 전문가와 상담하시길 권장합니다."라는 면책 조항을 포함합니다.
 """
 
-# OpenAI 클라이언트 초기화 (기존 유지)
+# OpenAI 클라이언트 초기화
 client = None
 try:
     api_key = os.environ.get("OPENAI_API_KEY")
@@ -60,17 +82,20 @@ except Exception as e:
     print(f"[Daily] OpenAI Init Error: {e}")
 
 
-# --- 1. 초기 안내 데이터 제공 (/daily/) ---
-@bp.route('/')
-def chat_usage():
+# --- 초기 안내 데이터 제공 ---
+@bp.route('/daily', strict_slashes=False)
+@token_required
+def chat_usage(user):
     user_name = session.get('user_nickname') or session.get('nickname') or session.get('user_name') or session.get('name') or DEFAULT_NAME
     user_id = session.get('user_id')
 
-    # [수정 부분] 기존 일상 상담 내역이 있는지 확인하여 가져옴
+    #기존 일상 상담 내역이 있는지 확인하여 가져옴
     history = []
     if user_id:
-        # 카테고리를 'daily'로 지정하여 MongoDB 기록 조회
-        history = get_chat_from_mongo(user_id, "daily")
+        try:
+            history = get_chat_from_mongo(user_id, "daily")
+        except:
+            pass
 
     chat_intro_html = f"""
     <div class="initial-text" style="margin-top: 5px;">
@@ -101,13 +126,14 @@ def chat_usage():
         "is_logged_in": bool(user_id),
         "chat_title": CHAT_TITLE,
         "intro_html": chat_intro_html,
-        "history": history  # [신규 추가] 기존 대화 내역 전달
+        "history": history
     })
 
 
-# --- 2. API 호출 및 하이브리드 저장 (/daily/ask) ---
-@bp.route('/ask', methods=['POST'])
-def ask():
+# ---API 호출 및 하이브리드 저장---
+@bp.route('/daily/ask', methods=['POST'])
+@token_required
+def ask(user):
     if client is None:
         return jsonify({'response': 'Error: OpenAI API Key missing.'}), 500
 
@@ -170,7 +196,6 @@ def ask():
                     print(f"[Daily Mongo Error] {mongo_err}")
 
             # [신규 추가] 히스토리 유지를 위한 MongoDB 공통 함수 호출
-            # category를 'daily'로 지정하여 저장합니다.
             save_chat_to_mongo(current_user_id, "daily", user_message, ai_response)
 
             vector_db = getattr(current_app, 'vector_db', None)
@@ -195,9 +220,10 @@ def ask():
         return jsonify({'response': '서버 통신 오류가 발생했습니다.'}), 500
 
 
-# --- 3. 리포트 생성 함수 (/daily/report) --- (기존 유지)
-@bp.route('/report', methods=['GET'])
-def generate_report():
+# --- 리포트 생성 함수 --
+@bp.route('/daily/report', methods=['GET'])
+@token_required
+def generate_report(user):
     user_id = session.get('user_id', 1)
     user_name = session.get('user_nickname') or session.get('user_name') or DEFAULT_NAME
 
