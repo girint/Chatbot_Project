@@ -1,76 +1,11 @@
-/* ----------결제 페이지-----------
-.pay-page {min-height: calc(100vh - 64px);display: grid;place-items: center;padding: 24px 14px;background: #fff;}
-
-.pay-card {width: min(520px, 100%); background: #F3EEFF;border-radius: 18px;padding: 22px 18px;box-shadow: 0 10px 30px rgba(0,0,0,0.08);}
-
-.pay-title {font-size: 24px;font-weight: 900;margin: 0 0 16px;color: #111;}
-
-.pay-section {background: #fff;border-radius: 12px; padding: 16px 14px;}
-.pay-section-title {margin: 0 0 10px;font-size: 18px;font-weight: 900;color: #111;}
-
-.pay-amount {display: flex;align-items: baseline;gap: 4px;font-weight: 900;color: #111;}
-.pay-amount.currency {font-size: 16px;opacity: 0.9;}
-.pay-amount-number {font-size: 22px;}
-
-.pay-divider {height: 2px;background: #b7a6ff;opacity: 0.8;border-radius: 999px;margin: 14px 0;}
-
-/* 결제페이부분 
-.pay-methods {display: grid;gap: 12px;}
-.pay-method {width: 100%; height: 44px;padding: 0; border-radius: 8px; border: 1px solid #d9d9ff;background: #fff;font-weight: 800;cursor: pointer; display: flex;align-items: center;justify-content: center;}
-
-/* 이미지 버튼// 텍스트 숨기고 배경으로 이미지 표시 
-.pay-method.is-img {color:transparent;text-shadow: none;background-repeat: no-repeat;background-position: center;background-size: cover;}
-
-
-
-
-/* 카드 
-.pay-method--card.is-img {background-image: url("../../public/img/card-pay.png");border-color: #111;}
-
-.pay-method--naver.is-img {background-image: url("../../public/img/naver_pay.png");border-color:#19ce60;}
-
-.pay-method--kakao.is-img {background-image: url("../../public/img/kakao-pay.png");border-color: #fee500;}
-
-.pay-method--toss.is-img {background-image: url("../../public/img/toss_pay.png");border-color: #2f6bff;}
-
-
-
-
-/* 눌렀을때 
-.pay-method.is-active {outline: 3px solid rgba(141,114,255,0.35);border-color: #8d72ff;}
-
-/* 동의 
-.pay-agree {display: grid;gap: 10px;padding: 0 6px 6px;}
-
-.pay-check {display: flex;align-items: center;gap: 10px;font-size: 14px;color: #333;font-weight: 700;}
-.pay-check input {width: 18px;height: 18px; accent-color: #8d72ff;}
-
-.pay-submit {width: 100%;height: 46px;margin-top: 8px;border: 0;border-radius: 10px;background: #111;color: #fff;font-weight: 900;cursor: pointer;}
-.pay-submit:disabled {opacity: 0.5;cursor: not-allowed;}
-
-/* 반응형
-@media (max-width:420px) {
-    .pay-card {padding: 18px 14px;border-radius: 16px;}
-    .pay-title {font-size: 22px;}
-    .pay-amount-number {font-size: 20px;}
-    .pay-method {height: 42px;font-size: 14px;}
-} */
-
-
-
-
-
-
 /* ------------------------------------------- */
 /* 결제페이지 변경 */
 /* ------------------------------------------- */
 .pay_all {width: 100%; display: flex; justify-content: center; align-items: center;}
 .pay-box {width: 1100px;}
-.pay-title-box {width: 1000px; height: 70px; display: flex; justify-content: center; margin: 60px 0 70px 45px; border: 3px solid #B9B6FF; align-items: center; padding-top: 7px;}
+.pay-title-box {width: 1000px; height: 70px; display: flex; justify-content: center; margin: 160px 0 110px 45px; border: 3px solid #B9B6FF; align-items: center; padding-top: 7px;}
 .pay-box h3 {font-weight: 700; border-bottom: 2px solid #B9B6FF;}
 
-.payment {width: 100%; height: 150px; border:3px solid #B9B6FF; border-radius: 10px; margin-bottom: 50px; }
-.pay-title-1 {font-size: 20px; font-weight: 700; margin: 5px 0 0 5px;}
 .pay-title {font-size: 16px; font-weight: 700; margin-bottom: 20px;}
 
 .pay-grid {display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;}
@@ -163,3 +98,7 @@ opacity: 0; transform: scale(0.6); pointer-events: none; transition: 0.15 ease;}
 .pay-guide-list li{display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.55; color: #374151; letter-spacing: -0.2px;}
 .pay-guide-list li::before{content: ""; width: 7px; height: 7px; margin-top: 7px; border-radius: 50%; background: #8b7dff; flex: 0 0 auto; box-shadow: 0 0 0 3px rgba(139,125,255,0.18);}
 .pay-guide-list li:last-child{font-weight: 800; color: #111827;}
+
+.payment {margin-bottom: 50px; display: flex; justify-content: end;}
+.pay-title-1 {margin-right: 20px; width: 80px; }
+.pay-title-2 {width: 80px;}

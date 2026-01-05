@@ -1,4 +1,4 @@
-// ChatList.jsx (메인)
+// 메인
 // - 왼쪽 목록 + 오른쪽 채팅 영역 레이아웃
 // - activeRoomId / messages를 localStorage에 저장해서 새로고침해도 유지
 // - 왼쪽 상단에 홈 버튼(메인 이동)
@@ -10,6 +10,20 @@ import "../../css/ChatList.css";
 
 export default function ChatList() {
   const navigate = useNavigate();
+
+  // // 채팅 페이지에서만 전체 스크롤 잠금 (빼도됨)
+  // useEffect(() => {
+  //   const prevOverflow = document.body.style.overflow;
+  //   const prevHeight = document.body.style.height;
+
+  //   document.body.style.overflow = "hidden";
+  //   document.body.style.height = "100vh";
+
+  //   return () => {
+  //     document.body.style.overflow = prevOverflow;
+  //     document.body.style.height = prevHeight;
+  //   };
+  // }, []);
 
   // rooms는 변하지 않는 더미데이터(필요하면 API로 교체)
   const rooms = useMemo(
@@ -29,11 +43,16 @@ export default function ChatList() {
   // 메시지 저장용 key
   const MSG_KEY = "chat_messages_v1";
 
+
+
   // 현재 선택된 방 id (localStorage에서 복구)
   const [activeRoomId, setActiveRoomId] = useState(() => {
     const saved = localStorage.getItem(ACTIVE_KEY);
     return saved ? Number(saved) : null;
   });
+
+  // 모바일에서 현재 화면 (list | chat)
+  const [mobileView, setMobileView] = useState("list");
 
   // 방별 메시지 저장 구조
   const [messagesByRoom, setMessagesByRoom] = useState(() => {
@@ -104,12 +123,12 @@ export default function ChatList() {
             <button
               type="button"
               className="chatHomeBtn"
-              onClick={() => navigate("/")} // 메인 라우트로 이동 (너 프로젝트에 맞게 변경 가능)
+              onClick={() => {navigate("/"); setMobileView("list")}} // 메인 라우트로 이동 
               title="메인으로"
             >
               ⟵
             </button>
-            <div className="chatTopTitle">메시지</div>
+            <div className="chatTopTitle">뒤로가기</div>
           </div>
         </div>
 
@@ -120,7 +139,7 @@ export default function ChatList() {
               key={room.id}
               type="button"
               className={`chatRoomRow ${activeRoomId === room.id ? "active" : ""}`}
-              onClick={() => setActiveRoomId(room.id)}
+              onClick={() => {setActiveRoomId(room.id); setMobileView("chat");}}
             >
               {/* 사진(프로필) */}
               {room.img ? (

@@ -178,7 +178,7 @@
 /* ---------------------------------------------- */
 /* 마이페이지 */
 /* ---------------------------------------------- */
-.mypage-content {max-width: 1000px; margin: 50px auto;}
+.mypage-content {max-width: 1000px; margin: 50px auto;margin-top: 100px;}
 .mypage-img {max-width: 180px; max-height: 230px; margin: 15px 50px;}
 .mypage-box {display:flex; border-top:5px solid #6868AC; padding:10px 0px; align-items:center; max-width: 400px;}
 .mypage-moneybox {display:flex;  align-items:center; max-width: 400px;}

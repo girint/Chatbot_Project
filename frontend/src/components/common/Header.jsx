@@ -32,7 +32,7 @@ const Header = () => {
   };
 
   return (
-    <Navbar expand="lg" className="header-all-div" style={{ padding: "0" }}>
+    <Navbar expand="lg" fixed="top" className="header-all-div" style={{ padding: "0" }}>
       <Container fluid className="header-container">
         <Navbar.Brand href="/">
           <img src="/img/Top_logo.png" alt="logo" className="logo" />
