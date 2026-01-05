@@ -1,9 +1,14 @@
 import { useId, useMemo, useState, useEffect } from "react";
 import Form from 'react-bootstrap/Form';
+import { useNavigate } from 'react-router-dom'
 import "../../css/Pay.css";
+import  { TokenManager }  from '../../api/User_Api';
+import { getMyProfile } from '../../api/Mypage_Api';
 
 export default function PaymentMethodSelect({ value, onChange, defaultValue = "CARD" }) {
     const groupId = useId();
+
+    const navigate = useNavigate();
 
     // ✅ 부모에서 value를 안 주면 내부 상태로 동작(언컨트롤드)
     const isControlled = value !== undefined;
@@ -26,6 +31,40 @@ export default function PaymentMethodSelect({ value, onChange, defaultValue = "C
         []
     );
 
+    const [nickname, setNickname] = useState('');
+    const [userInfo, setUserInfo] = useState(null);
+    const [loading, setLoading] = useState(true);
+    //충전금액 확인
+    const [currentCoin, setCurrentCoin] = useState(1000); // 예시: 서버/props로 받으면 더 좋음
+    const [chargeCoin, setChargeCoin] = useState(1000); // 기본 선택
+    const totalCoin = currentCoin + chargeCoin;
+
+    useEffect(() => {
+      if (!TokenManager.isLoggedIn()) {
+        setLoading(false);
+        return;
+      }
+    
+      const fetchProfile = async () => {
+        try {
+          const data = await getMyProfile();
+          setUserInfo(data);
+          setNickname(data.user_nickname || '');
+          setCurrentCoin(Number(data.user_money ?? 0));
+        } catch (err) {
+          console.error(err);
+          alert('유저 정보를 불러오지 못했습니다.');
+          TokenManager.logout();
+        } finally {
+          setLoading(false);
+        }
+      };
+    
+      fetchProfile();
+    }, []);
+
+    // const totalCoin = currentCoin + chargeCoin;
+
     const setSelected = (id) => {
         // ✅ 내부 상태 업데이트
         if (!isControlled) setInnerValue(id);
@@ -34,10 +73,7 @@ export default function PaymentMethodSelect({ value, onChange, defaultValue = "C
     };
 
 
-    //충전금액 확인
-    const [currentCoin] = useState(2000); // 예시: 서버/props로 받으면 더 좋음
-    const [chargeCoin, setChargeCoin] = useState(1000); // 기본 선택
-    const totalCoin = currentCoin + chargeCoin;
+    
 
 
     return (
@@ -171,8 +207,11 @@ export default function PaymentMethodSelect({ value, onChange, defaultValue = "C
                 </div>
                         
                 <div className="payment mt-5">
-                    <button className="pay-title-1">취소</button>
-                    <button className="pay-title-2">결제</button>
+                    <button 
+                    type="button" className="pay-title-1" onClick={()=>{ navigate('/myPage') }}
+                    >취소</button>
+                    <button 
+                    type="button" className="pay-title-2" onClick={()=>{ navigate('/myPage') }}>결제</button>
                 </div>
             </div>
         </div>

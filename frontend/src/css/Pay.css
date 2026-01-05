@@ -100,5 +100,7 @@ opacity: 0; transform: scale(0.6); pointer-events: none; transition: 0.15 ease;}
 .pay-guide-list li:last-child{font-weight: 800; color: #111827;}
 
 .payment {margin-bottom: 50px; display: flex; justify-content: end;}
-.pay-title-1 {margin-right: 20px; width: 80px; }
-.pay-title-2 {width: 80px;}
+.pay-title-1 {margin-right: 20px; width: 80px; border: 2px solid red; background-color: red; border-radius: 5px; color: white;}
+.pay-title-1:hover {background-color: rgb(213, 0, 0); border: 2px solid rgb(213, 0, 0);}
+.pay-title-2 {width: 80px; border: 2px solid rgb(179, 189, 253); background-color: rgb(206, 212, 249); border-radius: 5px;}
+.pay-title-2:hover {border: 2px solid rgb(179, 189, 253); background-color: rgb(179, 189, 253);}

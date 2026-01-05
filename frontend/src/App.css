@@ -30,6 +30,7 @@ html {overflow-y: scroll;}
 /* ----------------------------------------------------- */
 /* Header */
 /* ----------------------------------------------------- */
+.membership-mini-box {width: 100%; height: 50px; background-color: #0000d4;}
 /* 해더 전체 */
 .header-all-div, 
 .header-all-div.navbar, 

@@ -1,7 +1,7 @@
 /* ---------------------------------------------- */
 /* 회원가입 */
 /* ---------------------------------------------- */
-.signup-bs-page {background: #fff;}
+.signup-bs-page {background: #fff; margin-top: 80px; }
 .text-center {padding: 50px; margin: 20px 0;}
 .sns_login_text {font-size: 25px; font-weight: 400; padding-bottom: 10px;}
 .signup-bs-arrow {color: #d11; font-weight: 800;font-size: 13px;}
@@ -15,9 +15,9 @@
 
 .social-text{line-height: 1;}
 
-.social-btn.kakao{background: #FEE500; color: #000; border-color: #FEE500;}
-.social-btn.naver{background: #03C75A; color: #fff; border-color: #03C75A;}
-.social-btn.google{background: #fff; color: #111; border: 2px solid #e8e8e8;}
+.social-btn.kakao{background: #FEE500; color: #000; border-color: #FEE500; font-size: 15px;}
+.social-btn.naver{background: #03C75A; color: #fff; border-color: #03C75A; font-size: 15px;}
+.social-btn.google{background: #fff; color: #111; border: 2px solid #e8e8e8; font-size: 15px;}
 
 /* ✅ 반응형 */
 @media (max-width: 480px){
@@ -148,31 +148,34 @@
 /* ---------------------------------------------- */
 /* 로그인 */
 /* ---------------------------------------------- */
-.login-page {height: 900px; margin-top: 0; display: grid; place-items: center;}
-.login-card {width: 420px; background-color: #F3EEFF;padding: 34px 34px 28px;box-shadow: 0 10px 30px rgba(0,0,0,0.08);}
+.login-page {margin-top: 80px; display: grid; place-items: center;}
+.login-card {width: 450px; padding: 34px 34px 28px;  box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin: 70px 0;}
+.login-title {display: flex; justify-content: center; align-items: center; margin: 15px 0 30px 0;}
+.login-title h4 {font-size: 23px; font-weight: 800;}
+.login-content {display: flex; justify-content: center; align-items: center; text-align: center; padding: 20px; border-radius: 10px; font-size: 13px; margin-bottom: 20px; background-color: #0000000b; font-weight: 500;}
 
-.login-avatar {width: 150px;height: 150px; border-radius: 999px; background-color: white;margin: 0 auto 18px;display: grid;place-items: center;}
-.login-avatar img {width: 100px;height: 100px;object-fit: contain;}
+.login-social-login {display: flex; justify-content: center; align-items: center; margin: 50px 0 15px 0;}
+.login-social-login h5 {font-weight: 800;}
 
 .login-form {display: grid;gap: 10px;}
-.login-label {font-size: 22px;font-weight: 800;color: #111;margin-top: 6px;}
-.login-input {height:44px;border: 0;outline: none;background-color: #fff;padding: 0 12px;font-size: 16px;}
 
-.login-forgot {margin-top: 6px;background: transparent;border: 0;padding: 0;text-align: left;color: #222;font-size: 14px;cursor: pointer;}
+.login-input {height: 55px; border: 1px solid #44444433; outline: none; background-color: #fff; padding: 0 12px; font-size: 13px;}
 
-.btn-login {margin-top: 30px;height: 52px;border: 0;background: #9b96d8;color: #fff;font-size: 24px;font-weight: 800;cursor: pointer;}
-.btn-signup {height: 52px;border: 0;background: #c8c5ff;color: #111;font-size: 26px; font-weight: 900;cursor: pointer;}
+.login-forgot-box {display: flex; justify-content: end;}
+.login-forgot-box div {padding: 5px 10px 0 10px; font-size: 12px;}
+.login-forgot {margin-top: 6px; background: transparent; border: 0;padding: 0; text-align: left; color: #222; font-size: 12px; cursor: pointer;}
+
+.btn-login {margin-top: 30px; height: 55px; border: none; background: #5228adcf; color: #fff; font-size: 17px; font-weight: 800; cursor: pointer; border-radius: 5px;}
+.btn-signup {height: 55px; border: 2px solid #5228adcf; color: #111; font-weight: 900; cursor: pointer; font-size: 17px; border-radius: 5px;  background-color: white;}
 
 .social-row {display: flex;justify-content: space-between;gap: 18px;margin-top: 18px;}
 .social {width: 64px;height: 64px;border-radius: 999px;border: 0;font-size: 30px;font-weight: 900;cursor: pointer;}
 
-.social.N {background: #22c55e;color: #fff;}
-.social.K {background: #fde647;color: #111;}
-.social.G {background: #6366f1;color: #fff;}
-
 @media (max-width:400px){
     .login-card {width: caic(100vh - 32px);}
 }
+
+
 
 
 /* ---------------------------------------------- */

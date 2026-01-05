@@ -1,8 +1,8 @@
 /*  페이지 전체  */
-.chat-Page {--bot-color: #333;padding: 20px;max-width: 850px;margin: 0 auto;font-family: Pretendard, system-ui, sans-serif;}
+.chat-Page {--bot-color: #333;padding: 20px;max-width: 850px; margin-top: 80px; font-family: Pretendard, system-ui, sans-serif; }
 
 /* 제목 */
-.chat-title {text-align: center;color: var(--bot-color);margin-bottom: 30px;}
+.chat-title {text-align: center;color: var(--bot-color);margin-bottom: 30px; }
 
 /* 인트로 */
 .chat-intro {background: #f9f9f9;padding:0 10zpx;border-radius: 12px;border: 1px solid #eee;margin-bottom: 16px;font-size: 0.95rem;color: #444;}
