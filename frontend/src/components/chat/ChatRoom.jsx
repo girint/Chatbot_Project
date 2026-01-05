@@ -21,12 +21,17 @@ export default function ChatRoom({ room, messages = [], onSend }) {
 
   return (
     <div className="chatRoom">
+      {/* 상단 해더 */}
       <div className="chatRoomHeader">{room.title}</div>
 
+      {/* 메시지 영역 */}
       <div className="chatRoomBody">
         {messages.map((m) => (
           <div key={m.id} className={`chatBubble ${m.me ? "me" : ""}`}>
             {m.text}
+            <div className="chatBubbleTime">
+              {new Date(m.createdAt).toLocaleTimeString("ko-KR", {hour: "2-digit", minute: "2-digit",})}
+            </div>
           </div>
         ))}
         <div ref={endRef} />

@@ -30,16 +30,59 @@ html {overflow-y: scroll;}
 /* ----------------------------------------------------- */
 /* Header */
 /* ----------------------------------------------------- */
+/* 해더 전체 */
+.header-all-div, 
+.header-all-div.navbar, 
+.header-all-div.navbar-expand-1g {background-color: #fff !important;border-bottom: 2px solid #9390e7;}
+
+
+/* 로고 */
 .logo {width: 130px;}
-@media (max-width: 991px) {.navbar-collapse {background-color: #F9EEFF;}}
-.header-container {max-width: 1200px; margin: 0 auto; padding: 0 16px; background-color: #F9EEFF;}
+
+/* 컨테이너 */
+.header-all-div .container,
+.header-all-div .container-fluid,
+.header-all-div .navbar-collapse,
+.header-all-div .navbar-nav {background-color: transparent !important;}
+
+/* 내비게이션 */
+.header-all-div .nav-link {color: #2b2b3a !important;font-weight: 600;font-size: 14px;padding: 12px 14px;transition: color 0.2s ease;}
+
+/* hover */
+.header-all-div .nav-link:hover {color: #9898dc !important;}
+
+/* 닉네임(비활성) */
+.header-all-div .nav-link:first-child {cursor: default;opacity: 0.85;}
+
+/* 로그아웃 버튼 */
+.header-all-div .nav-link[role="button"]:hover {color: #ff6b6b !important;}
+
+/* 토글 버튼 */
+.navbar-toggler {border: none;}
+
+.navbar-toggler:focus {box-shadow: none;}
+
+/* 아이콘 색상(검정) */
+.navbar-toggler-icon {filter: invert(0);}
+
+/* 반응형 */
+@media (max-width: 991px) {
+  .header-all-div .navbar-collapse {
+    background-color: #fff !important;
+    border-top:1px solid #e6e6ef;
+  }
+
+  .header-all-div .nav-link {
+    padding: 12px 20px;
+  }
+}
 
 
 /* ----------------------------------------------------- */
 /* AI 소개 (메인 이미지) */
 /* ----------------------------------------------------- */
 .Introduce {display: flex; justify-content: center;}
-.AI_introduce_img {width: 1200px; max-width: 1200px; box-shadow: 0 5px 7px gray;}
+.AI_introduce_img {width: 1200px; max-width: 1200px; box-shadow: 0 5px 7px gray;margin-top: 80px;}
 
 
 /* ----------------------------------------------------- */

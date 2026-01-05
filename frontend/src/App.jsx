@@ -24,29 +24,49 @@ import { Outlet } from "react-router-dom"
 /* --- [통합 챗봇 컴포넌트 하나만 import] --- */
 import ChatComponent from './components/ChatComponent.jsx';
 
+// 내부 레이아웃
+function MainLayout() {
+    return (
+        <>
+            <Header />
+            <Outlet />
+            <BackToTop />
+            <Footer />
+        </>
+    );
+}
+
+// 해더/푸터 없는 레이아웃
+function EmptyLayout() {
+    return <Outlet />;
+}
+
 function App() {
 
     return (
-        <>
-        <Header/>
         <Routes>
-            <Route path="/" element={<Main />} />
-            <Route path="/Login" element={<Login />} />
-            <Route path="/Signup" element={<Signup />} />
-            <Route path="/Mypage" element={<Mypage />} />
-            <Route path="/Pay" element={<Pay />} />
-            <Route path="/api/ai/:aiId" element={<Detail />} />
-            <Route path='/ErrorPage' element={<ErrorPage />} />
-            <Route path='/NoticeWrite' element={<NoticeWrite />} />
-            <Route path='/ChatList' element={<ChatList />} />
-            <Route path="/notice/:noticeId" element={<NoticeDetail />} />
-            <Route path="/:type" element={<ChatComponent />} />
+            <Route element={<MainLayout />}>
+                <Route path="/" element={<Main />} />
+                <Route path="/Login" element={<Login />} />
+                <Route path="/Signup" element={<Signup />} />
+                <Route path="/Mypage" element={<Mypage />} />
+                <Route path="/Pay" element={<Pay />} />
+            {/*  <Route path='/Detail' element={<Detail />} /> */}
+                <Route path="/api/ai/:aiId" element={<Detail />} />
+                <Route path='/ErrorPage' element={<ErrorPage />} />
+                <Route path='/NoticeWrite' element={<NoticeWrite />} />
+                <Route path="/notice/:noticeId" element={<NoticeDetail />} />
+                {/* --- [통합 챗봇 컴포넌트 type에 맞춰서 적어줘야함] --- */}
+                <Route path="/:type" element={<ChatComponent />} />
+            </Route> 
+
+                {/* 해더푸터 없음 */}
+                <Route element={<EmptyLayout />}>
+                    <Route path='/ChatList' element={<ChatList />} />
+                </Route>
+   
         </Routes>   
-        <Outlet />
-        <BackToTop />
-        <Footer/>      
-        
-        </>
+
         )
 }
 
