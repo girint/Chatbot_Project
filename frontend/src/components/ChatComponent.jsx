@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { TokenManager,protectedApi } from '../api/User_Api';
 
-import "./ChatComponent.css";
+import "../css/ChatComponent.css";
 
 const ChatComponent = () => {
     const { type } = useParams();

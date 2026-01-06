@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
-import "./Detail.css";
+import "../css/Detail.css";
 import * as Api from '../api/AI_Detail_Api.js';
 
 export default function Detail() {  // props로 aiId 받기

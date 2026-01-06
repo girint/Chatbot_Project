@@ -1,6 +1,7 @@
-## 프로젝트 실행 오류시 
+## 프로젝트 실행 준비
 [Flask]
-pip install -r requirements.txt
+pip install -r requirements.txt  # 확장프로그램 설치
+python seed_basic_ai.py          # 초기 basic AI 세팅
 
 [Front]
 cd frontend                     # 프론트엔드 폴더 이동
@@ -21,9 +22,9 @@ AI 챗봇 프로젝트/
 │     ├── common/               # 반복사용 페이지 (헤더, 푸터)
 │     ├── notice/               # 게시판 페이지 (게시판 작성, 수정, 상세)
 │     ├── userbasic/            # 사용자 페이지 (마이페이지, 로그인, 회원가입, 결제, 개인비서 생성)
+│     ├── ChatComponent         # 챗봇 대화창 페이지
 │     ├── Detail                # 상세정보 페이지
-│     ├── Main                  # 메인 페이지
-│     └── UserView              # 기림이거~
+│     └── Main                  # 메인 페이지
 │
 └──  README.md                   #readme
 
