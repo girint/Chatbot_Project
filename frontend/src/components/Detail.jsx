@@ -7,6 +7,7 @@ export default function Detail() {  // props로 aiId 받기
     const { aiId } = useParams();
     const [aiData, setAiData] = useState(null);
     const [reviews, setReviews] = useState([]);
+    const [reviewData, setReviewData] = useState([]);
     const [newReview, setNewReview] = useState('');
     const [canWrite, setCanWrite] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -20,6 +21,7 @@ export default function Detail() {  // props로 aiId 받기
     useEffect(() => {
         console.log('🔍 useParams aiId:', aiId);
         fetchDetail();
+        fetchReviewsFromJson();
     }, [aiId]);
 
     const fetchDetail = async () => {
@@ -62,12 +64,25 @@ export default function Detail() {  // props로 aiId 받기
 
         await Api.deleteReview(aiId, reviewId);
         // UI 즉시 반영 (soft delete)
-            setReviews(prev =>
-                prev.filter(r => r.review_id !== reviewId)
-            );
+        setReviews(prev =>
+            prev.filter(r => r.review_id !== reviewId)
+        );
 
         // ✅ 삭제 후 즉시 상태 갱신
         await fetchDetail();
+    };
+
+    const fetchReviewsFromJson = async () => {
+        try {
+            const res = await fetch("/data/reviews.json");
+            const json = await res.json();
+
+            // aiId에 해당하는 리뷰만 가져오기
+            setReviewData(json[aiId] || []);
+        } catch (e) {
+            console.error("리뷰 JSON 로드 실패", e);
+            setReviewData([]);
+        }
     };
 
     if (loading) return <div>로딩 중...</div>;
@@ -90,9 +105,21 @@ export default function Detail() {  // props로 aiId 받기
                 <div className="wf-line" />
 
                 <section className="wf-reviews">
-                    <span className="wf-label">Reviews ({reviews.length})</span>
+                    <span className="wf-label mb-5">Reviews {3+Number(reviews.length)}</span>
 
                     <div className="wf-list">
+                        {reviewData.map((r) => (
+                            <div className="wf-row" key={r.review_id}>
+                                <div className="wf-avatarBox">
+                                    <img className="wf-avatarImg" src="/img/detail-1.png" alt="아바타" />
+                                </div>
+                                <div className="wf-reviewText">
+                                    <div className="wf-name">{r.user_nickname}</div>
+                                    <div className="wf-comment">
+                                        {r.review_write}
+                                    </div>
+                                </div>
+                            </div>))}
                         {reviews.map((r) => (
                             <div className="wf-row" key={r.review_id}>
                                 <div className="wf-avatarBox">
@@ -117,10 +144,10 @@ export default function Detail() {  // props로 aiId 받기
                     </div>
 
                     {canWrite && (
-                        <div className="wf-reviewWriteWrap">
+                        <div className="wf-reviewWriteWrap mt-5">
                             <form className="wf-reviewForm" onSubmit={handleSubmitReview}>
-                                <textarea 
-                                    className="wf-reviewTextarea" 
+                                <textarea
+                                    className="wf-reviewTextarea"
                                     placeholder="리뷰를 입력하세요"
                                     value={newReview}
                                     onChange={(e) => setNewReview(e.target.value)}

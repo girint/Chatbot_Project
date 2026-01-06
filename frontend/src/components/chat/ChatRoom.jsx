@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import "../../css/ChatRoom.css";
 
 export default function ChatRoom({ room, messages = [], onSend }) {
-  const [msg, setMsg] = useState("");
+  // const [msg, setMsg] = useState("");
   const endRef = useRef(null);
 
   // 메시지 추가되면 맨 아래로 자동 스크롤
@@ -12,12 +12,12 @@ export default function ChatRoom({ room, messages = [], onSend }) {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSubmit = () => {
-    const value = msg.trim();
-    if (!value) return;
-    onSend?.(value);
-    setMsg("");
-  };
+  // const handleSubmit = () => {
+  //   const value = msg.trim();
+  //   if (!value) return;
+  //   onSend?.(value);
+  //   setMsg("");
+  // };
 
   return (
     <div className="chatRoom">
@@ -30,14 +30,20 @@ export default function ChatRoom({ room, messages = [], onSend }) {
           <div key={m.id} className={`chatBubble ${m.me ? "me" : ""}`}>
             {m.text}
             <div className="chatBubbleTime">
-              {new Date(m.createdAt).toLocaleTimeString("ko-KR", {hour: "2-digit", minute: "2-digit",})}
+              {new Date(m.createdAt).toLocaleTimeString("ko-KR", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </div>
           </div>
         ))}
         <div ref={endRef} />
       </div>
 
-      <div className="chatRoomInput">
+      {/* <div className="chatRoomInput">
         <input
           className="chatInput"
           placeholder="메시지 입력"
@@ -50,7 +56,7 @@ export default function ChatRoom({ room, messages = [], onSend }) {
         <button className="chatSendBtn" type="button" onClick={handleSubmit}>
           전송
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }
