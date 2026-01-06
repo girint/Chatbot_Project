@@ -97,7 +97,7 @@ export default function Detail() {  // props로 aiId 받기
                     </div>
                     <div className="wf-rightText">
                         <h1 className="wf-title">{aiData.ai_name}</h1>
-                        <p className="wf-desc">{aiData.ai_prompt}</p>
+                        <p className="wf-desc">{aiData.ai_display}</p>
                         <p className="wf-tags">{aiData.ai_hashtag}</p>
                     </div>
                 </section>
