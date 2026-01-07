@@ -30,6 +30,7 @@ export default function Detail() {  // props로 aiId 받기
             console.log('📦 API 응답:', data);
             setAiData(data.ai);
             setReviews(data.reviews);
+            console.log('리뷰확인  ;', reviews);
             setCanWrite(data.can_write_review);
 
             setIsLoggedIn(data.is_logged_in);
@@ -123,7 +124,7 @@ export default function Detail() {  // props로 aiId 받기
                         {reviews.map((r) => (
                             <div className="wf-row" key={r.review_id}>
                                 <div className="wf-avatarBox">
-                                    <img className="wf-avatarImg" src="/img/detail-1.png" alt="아바타" />
+                                    <img className="wf-avatarImg" src={r?.user_image} alt="아바타" />
                                 </div>
                                 <div className="wf-reviewText">
                                     <div className="wf-name">{r.user_nickname}</div>
@@ -161,7 +162,7 @@ export default function Detail() {  // props로 aiId 받기
                         <div className="review-box">
                             {!isLoggedIn && '리뷰 작성은 로그인 후 AI 사용 시 가능합니다.'}
                             {isLoggedIn && !hasUsedAi && 'AI를 사용한 후 리뷰를 작성할 수 있습니다.'}
-                            {isLoggedIn && hasReview && '이미 리뷰를 작성하셨습니다.'}
+                            {isLoggedIn && hasReview && '리뷰작성 완료했습니다.'}
                         </div>
                     )}
                 </section>
@@ -196,7 +197,7 @@ export default function Detail() {  // props로 aiId 받기
                                     navigate(`/${aiData.ai_content}`);
                                 }}
                             >
-                                무료 사용 시작하기 ({usageInfo.used_count}/3)
+                                무료 사용 시작하기 ({3-usageInfo.used_count}/3)
                             </button>
                         ) : (
                             <button

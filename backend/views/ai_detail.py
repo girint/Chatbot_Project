@@ -74,7 +74,8 @@ def get_ai_detail(ai_id, user):
             'max_free': 3,
             'has_free_usage': has_free_usage
         },
-        'nickname': user.user_nickname
+        'nickname': user.user_nickname,
+        'pay': user.user_money
     }
 
     return jsonify(response)

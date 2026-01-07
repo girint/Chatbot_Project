@@ -240,6 +240,7 @@ class Review(db.Model):
             "review_id": self.review_id,
             "user_id": self.user_id,
             "user_nickname": self.user.user_nickname,
+            "user_image": self.user.user_image,
             "ai_id": self.ai_id,
             "review_write": self.review_write,
             "review_good": self.review_good,

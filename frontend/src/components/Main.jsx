@@ -80,10 +80,35 @@ const AIIntroduce = () => {
     }, []);
 
 
+    // 🔔 공지글 (1~3번)
+    const noticePosts = useMemo(() => {
+        return noticeData.filter(item => item.id >= 1 && item.id <= 3);
+    }, [noticeData]);
+
+    // 📄 일반 게시글
+    const normalPosts = useMemo(() => {
+        return noticeData.filter(item => item.id > 3);
+    }, [noticeData]);
+
+    const noticeCount = noticePosts.length;
+
     // 총 페이지 수
     const totalPages = useMemo(() => {
-        return Math.max(1, Math.ceil(noticeData.length / pageSize));
-    }, [noticeData.length, pageSize]);
+        if (normalPosts.length <= pageSize - noticeCount) return 1;
+
+        return (
+            1 +
+            Math.ceil(
+                (normalPosts.length - (pageSize - noticeCount)) / pageSize
+            )
+        );
+    }, [normalPosts.length, pageSize, noticeCount]);
+
+    // 페이지 게시글 번호 재지정
+    const normalStartNumber = useMemo(() => {
+        if (page === 1) return 1;
+        return (page - 2) * pageSize + (pageSize - noticeCount) + 1;
+    }, [page, pageSize, noticeCount]);
 
     // 현재 페이지가 범위를 벗어나면 보정
     useEffect(() => {
@@ -92,10 +117,17 @@ const AIIntroduce = () => {
     }, [page, totalPages]);
 
     // 현재 페이지에 보여줄 데이터만 slice
-    const pagedNoticeData = useMemo(() => {
-        const start = (page - 1) * pageSize;
-        return noticeData.slice(start, start + pageSize);
-    }, [noticeData, page, pageSize]);
+    const pagedNormalPosts = useMemo(() => {
+        const effectivePageSize =
+            page === 1 ? pageSize - noticeCount : pageSize;
+
+        const start =
+            page === 1
+                ? 0
+                : (page - 2) * pageSize + (pageSize - noticeCount);
+
+        return normalPosts.slice(start, start + effectivePageSize);
+    }, [normalPosts, page, pageSize, noticeCount]);
 
     // 페이지 버튼 개수 (pc 5 / 모바일 3)
     const visibleCount = isMobile ? 3 : 5;
@@ -157,7 +189,7 @@ const AIIntroduce = () => {
                                 카테고리 불러오는 중...
                             </div>
                         ) :
-                            basicAI_Data.slice(0, 8).map((item, index) => (  
+                            basicAI_Data.slice(0, 8).map((item, index) => (
                                 <Col key={item.name || index} xs={6} md={6} className="AICategory_circle" onClick={() => navigate(`/ai/${item.id}`)}>
                                     <div className="circle_div">
                                         <Image
@@ -237,14 +269,29 @@ const AIIntroduce = () => {
                         <span>조회수</span>
                     </div>
 
-                    {pagedNoticeData.length > 0 ? (
-                        pagedNoticeData.map((item) => (
+                    {/* 🔔 공지글 (1페이지에서만) */}
+                    {page === 1 && noticePosts.map(item => (
+                        <div
+                            key={`notice-${item.id}`}
+                            className="notice-row fixed"
+                            onClick={() => navigate(`/notice/${item.id}`)}
+                        >
+                            <span>공지</span>
+                            <span className="title">{item.title}</span>
+                            <span>{item.writer}</span>
+                            <span>{item.views}</span>
+                        </div>
+                    ))}
+
+                    {/* 📄 일반 게시글 */}
+                    {pagedNormalPosts.length > 0 ? (
+                        pagedNormalPosts.map((item, i) => (
                             <div
-                                className="notice-row"
                                 key={item.id}
+                                className="notice-row"
                                 onClick={() => navigate(`/notice/${item.id}`)}
                             >
-                                <span>{item.id}</span>
+                                <span>{normalStartNumber + i}</span>
                                 <span className="title">{item.title}</span>
                                 <span>{item.writer}</span>
                                 <span>{item.views}</span>

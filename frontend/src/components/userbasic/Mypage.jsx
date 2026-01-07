@@ -20,6 +20,19 @@ const Mypage = () => {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const fetchProfile = async () => {
+    try {
+      const data = await getMyProfile();
+      setUserInfo(data);
+      setNickname(data.user_nickname || '');
+    } catch (err) {
+      console.error(err);
+      alert('유저 정보를 불러오지 못했습니다.');
+      TokenManager.logout();
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChangeNickname = async () => {
     if (!nickname.trim()) {
@@ -68,6 +81,8 @@ const Mypage = () => {
     } catch (err) {
       alert(err.response?.data?.message || '프로필 이미지 변경 실패');
     }
+
+    await fetchProfile();
   };
 
   const handleDeleteUser = async () => {
@@ -91,30 +106,14 @@ const Mypage = () => {
     }
   };
 
-  //GPT (유저정보 불러오기)
   useEffect(() => {
-    if (!TokenManager.isLoggedIn()) {
-      setLoading(false);
-      return;
-    }
+  if (!TokenManager.isLoggedIn()) {
+    setLoading(false);
+    return;
+  }
+  fetchProfile();
+}, []);
 
-    const fetchProfile = async () => {
-      try {
-        const data = await getMyProfile();
-        setUserInfo(data);
-        setNickname(data.user_nickname || '');
-      } catch (err) {
-        console.error(err);
-        alert('유저 정보를 불러오지 못했습니다.');
-        TokenManager.logout();
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, []);
-  //
 
   if (loading) {
     return (
