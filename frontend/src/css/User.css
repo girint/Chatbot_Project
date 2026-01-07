@@ -181,10 +181,115 @@
 /* ---------------------------------------------- */
 /* 마이페이지 */
 /* ---------------------------------------------- */
-.mypage-content {max-width: 1000px; margin: 50px auto;margin-top: 100px;}
-.mypage-img {max-width: 180px; max-height: 230px; margin: 15px 50px;}
-.mypage-box {display:flex; border-top:5px solid #6868AC; padding:10px 0px; align-items:center; max-width: 400px;}
-.mypage-moneybox {display:flex;  align-items:center; max-width: 400px;}
-.mypage-money {display: flex; border-radius: 5px; border:2px solid #c5c5c563; min-width: 200px; min-height: 40px; align-items: center; padding-left: 5px; margin-right: 10px;}
-.mypage-membership {min-height: 355px; border: 2px solid #6868ac4a; border-radius: 10px; padding: 15px 0 0 10px;}
-.mypage-membership1 {min-height: 355px; border: 2px solid #6868ac4a; border-radius: 10px; padding: 15px 10px 0 10px;}
+.mypage-content {max-width: 1000px; margin: 120px auto 50px;padding: 0 12px;}
+
+/* 상단 */
+.mypage-topCard {background: #fff;border-radius: 18px;box-shadow: 0 14px 32px rgba(104,104,172,0.16);padding: 22px;}
+
+.mypage-profileArea {display: flex;gap: 22px;align-items: center;}
+
+.mypage-img {width: 200px;height: 200px;object-fit: cover;border-radius: 16px;}
+
+.mypage-profileText {flex: 1;margin-left: 15px;}
+
+.mypage-titleRow {display: flex;align-items: center;gap: 10px;margin-bottom: 10px;}
+
+.mypage-title {margin: 0;font-size: 22px;font-weight: 800;color: #222;}
+
+.mypage-chip {display: inline-flex;align-items: center;height: 28px;padding: 0 10px;border-radius: 999px;background: rgba(104,104,172,0.12);color: #3f3f7a;font-weight: 700;font-size: 13px;}
+
+/* 잔액 박스 */
+.mypage-moneybox {display: flex;align-items: center;gap: 10px;margin-top: 8px;flex-wrap: wrap;}
+
+.mypage-money {height: 42px;min-width: 240px;display: flex;align-items: center;padding: 0 14px;border-radius: 12px;background: linear-gradient(135deg, #f3f3ff,#fff);color: #3f3f7a;font-weight: 600;box-shadow: inset 0 0 0 1px rgba(104,104,172,0.18);}
+
+.mypage-primaryBtn {border: none !important;background: #6868AC !important;border-radius: 12px !important;padding: 10px 14px !important;font-weight: 700 !important;}
+.mypage-primaryBtn:hover {opacity: 0.92;}
+
+/* 하단 */
+.mypage-bottomRow {margin-top: 18px;}
+
+.mypage-card {background: #fff;border-radius: 18px;padding: 22px;box-shadow: 0 12px 28px rgba(0,0,0,0.08);border: none;min-height: 320px;display: flex;flex-direction: column;pointer-events: auto;}
+
+.mypage-cardAccent {background: linear-gradient(180deg, #f8f8ff, #fff);box-shadow: 0 16px 36px rgba(104,104,172,0.18);}
+
+.mypage-cardHead {display: flex;align-items: center;justify-content: space-between;margin-bottom: 24px;}
+
+.mypage-cardTitle {margin: 0;font-size: 18px;font-weight: 800;color: #222;}
+
+.mypage-badge {background: #6868AC;color: #fff;border-radius: 80px;padding: 6px 10px;font-size: 12px;font-weight: 700;}
+.mypage-badgeOutline {background: transparent;color: #6868AC;border: 1px solid rgba(104,104,172,0.45);border-radius:50px;padding: 6px 10px;font-size: 12px;font-weight: 800;}
+
+/* 개인비서 아이콘 4개 */
+.mypage-grid4 {display: grid;grid-template-columns: repeat(2, minmax(0,1fr));gap: 50px;margin-top: 30px;}
+
+/* 이미지 클릭 */
+.mypage-imgClick {display: flex;justify-content: center;cursor: pointer;pointer-events: auto;}
+
+.mypage-circleImg {width: 92px !important;height: 92px !important;object-fit: cover;border-radius: 50%; box-shadow: 0 10px 20px rgba(0,0,0,0.10);justify-self: center;transition: all 0.18s ease;}
+/* 이미지만 호버 */
+.mypage-imgClick:hover .mypage-circleImg {transform: translateY(-4px) scale(1.04);box-shadow: 0 14px 28px rgba(104,104,172,0.28);}
+/* 이미지 클릭효과 */
+.mypage-imgClick:active .mypage-circleImg {transform: scale(0.96);}
+
+/* 폼 */
+.mypage-formBlock {margin-top: 6px;}
+
+.mypage-label {font-weight: 800;color: #333;margin: 10px 0 6px;font-size: 13px;}
+
+.mypage-inputGroup .form-control {border-radius: 12px 0 0 12px !important;border: 1px solid rgba(0,0,0,0.12) !important;padding: 10px 12px !important;}
+.mypage-outlineBtn {border-radius: 0 12px 12px 0 !important;border: 1px solid #6868AC !important;background: #fff !important;color: #6868AC !important;font-weight: 800 !important;transition: all 0.2s ease;  padding: 10px 12px !important;}
+.mypage-outlineBtn:hover {background:#6868AC !important;color: #fff !important;}
+.mypage-outlineBtn:active {transform: scale(0.97);}
+
+
+/* 하단 위험 버튼 */
+.mypage-dangerRow { margin-top: 15px;}
+
+/* 반응형 992이하 태블릿 */
+@media (max-width:992px){
+  .mypage-content {margin-top: 100px;}
+
+  .mypage-img {width: 180px;height: 180px;}
+
+  .mypage-grid4 {gap: 28px;margin-top: 22px;}
+}
+
+/* 768이하 상단 세로정렬 + 버튼 폭 */
+@media (max-width:768px){
+  .mypage-topCard {padding: 18px;}
+
+  .mypage-profileArea {flex-direction: column;align-items: flex-start;gap: 14px;}
+
+  .mypage-img {width: 100%;max-width: 340px;height: 220px;}
+
+  .mypage-profileText {margin-left: 0;width: 100%;}
+
+  .mypage-titleRow {width: 100%;justify-content: space-between;}
+
+  .mypage-moneybox {width: 100%;gap: 10px;}
+
+  .mypage-money {flex: 1;min-width: 0;width: 100%;}
+
+  .mypage-primaryBtn {width: 100%;}
+
+  /* 하단 카드 높이 */
+  .mypage-card {min-height: unset;padding: 18px;}
+  /* 개인비서 촘촘이 */
+  .mypage-grid4 {gap: 18px;margin-top: 18px;}
+}
+
+/* 576이하 아이콘/텍스트/여백 더 비빔 */
+@media (max-width:576px){
+  .mypage-content {margin-top: 90px;padding: 0 10px;}
+
+  .mypage-title {font-size: 20px;}
+  .mypage-chip {font-size: 12px;}
+
+  .mypage-money {height: 40px;padding: 0 12px;}
+
+  .mypage-circleImg {width: 82px !important;height: 82px !important;}
+
+  /* 그리드 2*2 유지 하면서 더 조임 */
+  .mypage-grid4 {gap: 14px;}
+}
