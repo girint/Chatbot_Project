@@ -1,6 +1,6 @@
-# backend/app.py (완전체 - 에러 핸들러 추가)
+# backend/app.py
 
-from flask import Flask, jsonify
+from flask import Flask, request,make_response
 from flask_cors import CORS
 from flask_migrate import Migrate
 import os
@@ -30,6 +30,7 @@ from backend.views.Chatbot.learning_views import bp as learning_bp
 from backend.views.Chatbot.legal_views import bp as legal_bp
 from backend.views.Chatbot.tech_views import bp as tech_bp
 from backend.views.Chatbot.history_views import bp as history_bp
+from backend.views.ai_chat import bp as ai_chat_bp
 
 def create_app():
     load_dotenv()
@@ -72,22 +73,16 @@ def create_app():
     db.init_app(app)
     Migrate(app, db)
 
-    # 🔥 500 에러에도 CORS 헤더 추가 (핵심!)
-    @app.errorhandler(500)
-    def internal_error(error):
-        response = jsonify({'error': 'Internal server error'})
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add('Access-Control-Allow-Headers', 'Authorization,Content-Type')
-        response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
-        return response, 500
-
-    # 모든 응답에 CORS 헤더
-    @app.after_request
-    def after_request(response):
-        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
-        response.headers.add('Access-Control-Allow-Headers', 'Authorization,Content-Type')
-        response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
-        return response
+    # 500 에러에도 CORS 헤더 추가
+    @app.before_request
+    def handle_preflight():
+        if request.method == 'OPTIONS':
+            response = make_response()
+            response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+            response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE,OPTIONS'
+            response.headers['Access-Control-Allow-Headers'] = 'Authorization,Content-Type'
+            return response  # 200 OK 자동 반환
+        return None
 
     # Blueprint 등록
     app.register_blueprint(user_bp, url_prefix="/api")
@@ -96,6 +91,8 @@ def create_app():
     app.register_blueprint(main_bp, url_prefix="/api")
     app.register_blueprint(mypage_bp, url_prefix="/api")
     app.register_blueprint(chatlist_bp, url_prefix="/api")
+
+    app.register_blueprint(ai_chat_bp, url_prefix="/api")
 
     app.register_blueprint(wellness_bp)
     app.register_blueprint(career_bp, url_prefix="/api")

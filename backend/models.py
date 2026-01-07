@@ -123,6 +123,11 @@ class BasicAI(db.Model):
     ai_image = db.Column(db.String(500), nullable=True)                        # AI 이미지 경로
     ai_prompt = db.Column(db.Text, nullable=True)                              # 시스템 프롬프트
     ai_use_count = db.Column(db.Integer, nullable=False, default=0)            # AI 사용 횟수
+    ai_display= db.Column(db.String(50))
+    ai_system_prompt = db.Column(db.Text, nullable=True)
+    ai_system_intro = db.Column(db.Text)
+    ai_temperature = db.Column(db.Integer)
+    ai_model = db.Column(db.String(50), default="gpt-3.5-turbo")
 
     def __repr__(self):
         return f"<BasicAI {self.ai_id} {self.ai_name}>"
@@ -139,6 +144,11 @@ class BasicAI(db.Model):
             "ai_image": self.ai_image,
             "ai_prompt": self.ai_prompt,
             "ai_use_count": self.ai_use_count,
+            "ai_display": self.ai_display,
+            "ai_system_prompt" : self.ai_system_prompt,
+            "ai_system_intro" : self.ai_system_intro,
+            "ai_temperature": self.ai_temperature,
+            "ai_model": self.ai_model,
         }
 
 class CustomAI(db.Model):
