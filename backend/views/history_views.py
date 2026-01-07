@@ -2,10 +2,10 @@ from flask import Blueprint, render_template, session, jsonify
 from backend.models import db, ChatLog
 from backend.views.database import get_mongo_db
 
-bp = Blueprint('history', __name__, url_prefix='/api/history')
+history_bp = Blueprint('history', __name__)
 
 
-@bp.route('/')
+@history_bp.route('/history')
 def index():
     user_id = session.get('user_id')
     if not user_id:
@@ -16,7 +16,7 @@ def index():
     return render_template('history/index.html', logs=logs)
 
 
-@bp.route('/detail/<int:sql_id>')
+@history_bp.route('/history/detail/<int:sql_id>')
 def detail(sql_id):
     # 2. 특정 대화 클릭 시 MongoDB에서 전문 가져오기
     mongodb = get_mongo_db()

@@ -34,7 +34,7 @@ def token_required(f):
 #------------------------------------------------
 
 load_dotenv()
-bp = Blueprint('ai_chat', __name__)
+ai_chat_bp = Blueprint('ai_chat', __name__)
 
 # OpenAI 클라이언트
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"),
@@ -61,7 +61,7 @@ def get_ai_config(ai_type):
 
 
 # 1. AI 초기화
-@bp.route('/ai/aa/<ai_type>', methods=['GET'])
+@ai_chat_bp.route('/ai/aa/<ai_type>', methods=['GET'])
 @token_required
 def ai_init(ai_type,user):
     if not client: return jsonify({'error': 'OpenAI 오류'}), 500
@@ -69,20 +69,18 @@ def ai_init(ai_type,user):
     if not config: return jsonify({'error': 'AI 없음'}), 404
 
     user_name = user.user_nickname
-    user_id = user.user_id
-    history = get_chat_from_mongo(user_id, ai_type) if user_id else []
 
     intro_html = config['system_intro'].replace('{user_name}', user_name)
 
     return jsonify({
         'status': 'success', 'ai_type': ai_type, 'ai_config': {
             'title': config['title'], 'tip': config['tip'], 'display': config['display']
-        }, 'user_name': user_name, 'intro_html': intro_html, 'history': history
+        }, 'user_name': user_name, 'intro_html': intro_html
     })
 
 
-# 2. AI 대화 (핵심)
-@bp.route('/ai/aa/<ai_type>/ask', methods=['POST'])
+# 2. AI 대화
+@ai_chat_bp.route('/ai/aa/<ai_type>/ask', methods=['POST'])
 @token_required
 def ai_ask(ai_type,user):
     if not client: return jsonify({'error': 'OpenAI 오류'}), 500
@@ -131,7 +129,7 @@ def ai_ask(ai_type,user):
 
 
 # 3. AI 목록
-@bp.route('/ai/aa/list')
+@ai_chat_bp.route('/ai/aa/list')
 @token_required
 def ai_list(user):
     ais = BasicAI.query.filter_by(ai_type=False).all()
@@ -143,7 +141,7 @@ def ai_list(user):
 
 
 # 4. 리포트
-@bp.route('/ai/aa/<ai_type>/report')
+@ai_chat_bp.route('/ai/aa/<ai_type>/report')
 @token_required
 def ai_report(ai_type,user):
     config = get_ai_config(ai_type)

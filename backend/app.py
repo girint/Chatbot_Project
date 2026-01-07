@@ -1,7 +1,6 @@
 # backend/app.py
 
-from flask import Flask, request,make_response
-from flask_cors import CORS
+from flask import Flask, request
 from flask_migrate import Migrate
 import os
 from dotenv import load_dotenv
@@ -19,36 +18,16 @@ from backend.views.ai_detail import ai_detail_bp
 from backend.views.main import main_bp
 from backend.views.mypage import mypage_bp
 from backend.views.chatlist import chatlist_bp
+from backend.views.naver_auth import naver_bp
+from backend.views.ai_chat import ai_chat_bp
+from backend.views.history_views import history_bp
 
-# --- [챗봇 Blueprint import] ---
-from backend.views.Chatbot.wellness_views import bp as wellness_bp
-from backend.views.Chatbot.career_views import bp as career_bp
-from backend.views.Chatbot.daily_views import bp as daily_bp
-from backend.views.Chatbot.finance_views import bp as finance_bp
-from backend.views.Chatbot.health_views import bp as health_bp
-from backend.views.Chatbot.learning_views import bp as learning_bp
-from backend.views.Chatbot.legal_views import bp as legal_bp
-from backend.views.Chatbot.tech_views import bp as tech_bp
-from backend.views.Chatbot.history_views import bp as history_bp
-from backend.views.ai_chat import bp as ai_chat_bp
 
 def create_app():
     load_dotenv()
     app = Flask(__name__)
 
-    # CORS 설정
-    # CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://localhost:5000"]}}, supports_credentials=True)
-    # CORS(app,
-    #      origins=["http://localhost:3000"],
-    #      supports_credentials=True,
-    #      methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    #      allow_headers=['Authorization', 'Content-Type'])
-    #
-    # # 500 에러에도 CORS 헤더 추가
-    # @app.before_request
-    # def handle_preflight():
-    #     if request.method == 'OPTIONS':
-    #         return '', 200
+
     @app.after_request
     def after_request(response):
         response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
@@ -57,11 +36,11 @@ def create_app():
         response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE,OPTIONS,PATCH'
         return response
 
-
     @app.before_request
     def before_request():
         if request.method == 'OPTIONS':
             return '', 200
+
 
     # SQLAlchemy 설정
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///AI.db"
@@ -70,7 +49,7 @@ def create_app():
 
     # MongoDB 초기화
     try:
-        mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+        mongo_uri = os.getenv("MONGO_URI")
         mongo_client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
         app.mongodb = mongo_client["chatbot_master"]
         mongo_client.server_info()
@@ -106,18 +85,9 @@ def create_app():
     app.register_blueprint(main_bp, url_prefix="/api")
     app.register_blueprint(mypage_bp, url_prefix="/api")
     app.register_blueprint(chatlist_bp, url_prefix="/api")
-
     app.register_blueprint(ai_chat_bp, url_prefix="/api")
-
-    app.register_blueprint(wellness_bp)
-    app.register_blueprint(career_bp, url_prefix="/api")
-    app.register_blueprint(daily_bp, url_prefix="/api")
-    app.register_blueprint(finance_bp)
-    app.register_blueprint(health_bp)
-    app.register_blueprint(learning_bp)
-    app.register_blueprint(legal_bp)
-    app.register_blueprint(tech_bp)
-    app.register_blueprint(history_bp)
+    app.register_blueprint(naver_bp, url_prefix="/api")
+    app.register_blueprint(history_bp, url_prefix="/api")
 
     return app
 

@@ -111,7 +111,7 @@ const ChatComponent = () => {
     };
 
     // 리포트 버튼 노출 조건 (원하는 기준으로 숫자만 변경// 추가)
-    const canShowReport = chat.length >= 6;     // 예: 3번 황복(유저+AI 6개)이상 일때 노출
+    const canShowReport = chat.length >= 6;
 
     // css에서 쓰는 변수(봇 컬러)
     const cssVars = {
