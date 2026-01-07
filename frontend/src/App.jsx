@@ -41,6 +41,17 @@ function EmptyLayout() {
     return <Outlet />;
 }
 
+// 해더만 있는 레이아웃
+function NoFooterLayout() {
+    return (
+        <>
+            <Header />
+            <Outlet />
+            <BackToTop />
+        </>
+    )
+}
+
 function App() {
 
     return (
@@ -51,23 +62,29 @@ function App() {
                 <Route path="/Signup" element={<Signup />} />
                 <Route path="/Mypage" element={<Mypage />} />
                 <Route path="/Pay" element={<Pay />} />
-            {/*  <Route path='/Detail' element={<Detail />} /> */}
+                {/*  <Route path='/Detail' element={<Detail />} /> */}
                 <Route path="/ai/:aiId" element={<Detail />} />
                 <Route path='/ErrorPage' element={<ErrorPage />} />
                 <Route path='/NoticeWrite' element={<NoticeWrite />} />
                 <Route path="/notice/:noticeId" element={<NoticeDetail />} />
                 {/* --- [통합 챗봇 컴포넌트 type에 맞춰서 적어줘야함] --- */}
+                {/* <Route path="/:type" element={<ChatComponent />} /> */}
+            </Route>
+
+            {/* 해더만 있음 */}
+            <Route element={<NoFooterLayout />}>
+                {/* --- [통합 챗봇 컴포넌트 type에 맞춰서 적어줘야함] --- */}
                 <Route path="/:type" element={<ChatComponent />} />
-            </Route> 
+            </Route>
 
-                {/* 해더푸터 없음 */}
-                <Route element={<EmptyLayout />}>
-                    <Route path='/ChatList' element={<ChatList />} />
-                </Route>
-   
-        </Routes>   
+            {/* 해더푸터 없음 */}
+            <Route element={<EmptyLayout />}>
+                <Route path='/ChatList' element={<ChatList />} />
+            </Route>
 
-        )
+        </Routes>
+
+    )
 }
 
 export default App;
