@@ -11,7 +11,7 @@ import Login from './components/userbasic/Login.jsx'
 import Signup from './components/userbasic/Signup.jsx'
 import Mypage from './components/userbasic/Mypage.jsx'
 import Pay from './components/userbasic/Pay.jsx'
-import Detail from './components/chat/Detail.jsx'
+import Detail from './components/Detail.jsx'
 import ErrorPage from "./components/common/ErrorPage.jsx"
 import NoticeWrite from './components/notice/NoticeWrite.jsx';
 import ChatList from './components/chat/ChatList.jsx';
@@ -22,7 +22,7 @@ import BackToTop from "./components/common/BackToTop.jsx";
 import { Outlet } from "react-router-dom"
 
 /* --- [통합 챗봇 컴포넌트 하나만 import] --- */
-import ChatComponent from './components/chat/ChatComponent.jsx';
+import ChatComponent from './components/ChatComponent.jsx';
 
 // 내부 레이아웃
 function MainLayout() {
@@ -74,12 +74,11 @@ function App() {
             {/* 해더만 있음 */}
             <Route element={<NoFooterLayout />}>
                 {/* --- [통합 챗봇 컴포넌트 type에 맞춰서 적어줘야함] --- */}
-                
+                <Route path="/:type" element={<ChatComponent />} />
             </Route>
 
             {/* 해더푸터 없음 */}
             <Route element={<EmptyLayout />}>
-                <Route path="/:type" element={<ChatComponent />} />
                 <Route path='/ChatList' element={<ChatList />} />
             </Route>
 
