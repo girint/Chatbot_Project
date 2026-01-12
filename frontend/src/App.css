@@ -30,11 +30,9 @@ html {overflow-y: scroll;}
 /* ----------------------------------------------------- */
 /* Header */
 /* ----------------------------------------------------- */
-/* 상단배너 */
-.membership-mini-box {width: 100%; height: 35px; background-color: #5228ADCF; color: white; font-size: 13px; font-weight: 800; display: flex; justify-content: center; align-items: center; position: relative;}
+.membership-mini-box {width: 100%; height: 50px; background-color: #0000d4;}
 
 /* 해더 전체 */
-.header-all-div {display: block !important;}
 .header-all-div, 
 .header-all-div.navbar, 
 .header-all-div.navbar-expand-1g {background-color: #fff !important;border-bottom: 2px solid #9390e7;}
@@ -86,7 +84,7 @@ html {overflow-y: scroll;}
 /* AI 소개 (메인 이미지) */
 /* ----------------------------------------------------- */
 .Introduce {display: flex; justify-content: center;}
-.AI_introduce_img {width: 1200px; max-width: 1200px; box-shadow: 0 5px 7px gray;}
+.AI_introduce_img {width: 1200px; max-width: 1200px; box-shadow: 0 5px 7px gray;margin-top: 80px;}
 
 
 /* ----------------------------------------------------- */
