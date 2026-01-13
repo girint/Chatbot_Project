@@ -3,5 +3,6 @@
 __pycache__/
 /backend/migrations/
 /backend/static/
-.env
+backend/.env
 AI.db
+backend/chroma_db/
