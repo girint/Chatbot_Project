@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from werkzeug.security import generate_password_hash
 # DB 설정
 BASE_DIR = Path(__file__).parent.absolute()
-DB_PATH = BASE_DIR / "instance" / "AI.db"
+DB_PATH = BASE_DIR / "AI.db"
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 app = Flask(__name__)
@@ -34,7 +34,7 @@ def seed_basic_ai():
             'admin2': (2, 'qorrlfla@naver.com', '1234',"목짧은기린"),
             'admin3': (3, 'wltnwjd@naver.com', '1234',"도비는1004"),
             'admin4': (4, 'rlaxodus@naver.com', '1234',"뱃속에거지"),
-            'admin5': (5, 'dlrlghk@naver.com', '1234',"이가화"),
+            'admin5': (5, 'dlrlghk@naver.com', '1234',"자유로움"),
         }
 
         notices = {

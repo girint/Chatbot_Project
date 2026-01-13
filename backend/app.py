@@ -27,6 +27,14 @@ def create_app():
     load_dotenv()
     app = Flask(__name__)
 
+    #backend/AI.db 상대경로
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///{}".format(os.path.join(BASE_DIR,"AI.db"))
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY", "your-secret-key")
+
+    db.init_app(app)
+    Migrate(app, db)
 
     @app.after_request
     def after_request(response):
@@ -40,12 +48,6 @@ def create_app():
     def before_request():
         if request.method == 'OPTIONS':
             return '', 200
-
-
-    # SQLAlchemy 설정
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///AI.db"
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY", "your-secret-key")
 
     # MongoDB 초기화
     try:
@@ -72,11 +74,6 @@ def create_app():
         print(f"[ERROR] Vector DB Failed: {e}")
         app.vector_db = None
 
-    # DB 초기화
-    db.init_app(app)
-    Migrate(app, db)
-
-
 
     # Blueprint 등록
     app.register_blueprint(user_bp, url_prefix="/api")
@@ -94,6 +91,4 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
     app.run(host="0.0.0.0", port=5000, debug=True)
