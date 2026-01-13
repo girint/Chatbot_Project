@@ -4,6 +4,7 @@ from flask import Flask, request
 from flask_migrate import Migrate
 import os
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 # --- [DB 관련 라이브러리 추가] ---
 from pymongo import MongoClient
@@ -38,7 +39,9 @@ def create_app():
 
     @app.after_request
     def after_request(response):
-        response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+        origin = request.headers.get('Origin')
+        if origin in ['http://localhost:3000', 'http://localhost:80']:
+            response.headers['Access-Control-Allow-Origin'] = origin
         response.headers['Access-Control-Allow-Credentials'] = 'true'
         response.headers['Access-Control-Allow-Headers'] = 'Authorization,Content-Type'
         response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE,OPTIONS,PATCH'
