@@ -1,37 +1,43 @@
 ![메인페이지](./docs/images/wmd_main2.png)
 
+---
 
 ## 💫 AI Web App Team Project
 생성형 AI Web App 기획 및 개발 - 개인 맞춤형 AI 플랫폼
 
+---
+
 ## 🕒 개발 시간
 2025/12/08 ~ 2025/01/09 (약 4주간)
 
-## 🤝 같이 개발한 팀원들
-🐧 이상수 : 팀장(바지)<br>
-🐣 김태연 : 프론트엔드<br>
-🦒 백기림 : 백엔드, DB, AI<br>
-🐶 이기화 : 챗봇 <br>
-🐸 지수정 : 프론트엔드
+---
 
-<br>
+## 🤝 같이 개발한 팀원들
+|  | 이름 | 역할 | 깃허브                                                         |
+|----|------|------|-------------------------------------------------------------|
+| 🐧 | **이상수** | 팀장 · 전체 구조/AI 통합 | [![상수](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/Lsangsu)          |
+| 🦒 | **백기림** | 백엔드 · DB/AI 서비스 | [![노션 문서](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/girint) |
+| 🐣 | **김태연** | 프론트엔드 · UI/UX | [![노션 문서](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/KimTaeyeon1111)       |
+| 🐶 | **이기화** | 챗봇 로직 · 응답 처리 | [![노션 문서](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/kendou11)       |
+| 🐸 | **지수정** | 프론트엔드 · 레이아웃 | [![노션 문서](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/ehqlsms1004)       |
+
+---
 
 ## 📜 프로젝트 소개
-**특정 파트에 최적화 된 AI를 제공하는 플랫폼**<br>
+**역할별 최적화 AI로 개인화된 경험을 제공하는 플랫폼**<br>
 역할별로 분리된 AI 설계를 통해, 각 기능 영역에서 일관된 응답 품질을 유지합니다.<br>
 사용자는 목적에 맞는 AI와 상호작용하며, 단순한 질의응답을 넘어 지속적인 AI 경험을 제공합니다.
 
-<br>
+---
 
 ## 🌞프로젝트 구조
 <details><summary>AI 챗봇 프로젝트</summary>
-<br>
 
 ![AI챗봇프로젝트구조](./docs/images/pj_structure.png)
 
 </details>
-<br>
 
+---
 
 ## 📢 기획 의도
 개인비서 AI는 단순한 기능 구현보다,<br>
@@ -43,20 +49,20 @@ AI 채팅을 중심으로 한 기본 서비스 흐름을 먼저 구현하고,<br
 <br><br>
 이를 통해 실제 서비스로 발전시킬 수 있는 기반을 마련하고자 했습니다.
 
-<br>
+---
 
-## 📚 개발환경
-| Layer | Stack |
-|-------|--------|
-| Frontend | React · JavaScript · React-Bootstrap |
-| Backend | Flask · Python · SQLAlchemy |
-| AI | OpenAI API|   
-| DB | SQLite |  
-| Infrastructire | Docker · Nginx |  
-| Tools | VS Code · PyCharm · Figma · Notion · GitHub |  
+## 📚 기술스택
+| Layer | Stack                                       |
+|-------|---------------------------------------------|
+| **Frontend** | React · JS · React-Bootstrap · axios          |
+| **Backend** | Flask · Python                              |
+| **AI** | OpenAI API                                  |
+| **Database** | SQLAlchemy                                  |
+| **Infra** | Docker · Nginx                              | 
+| **Tools** | VS Code · PyCharm · Figma · Notion · GitHub |  
 
 
-<br>
+---
 
 ## 📚목차📚
 01. 📌 [Diagram](#-diagram)
@@ -68,106 +74,45 @@ AI 채팅을 중심으로 한 기본 서비스 흐름을 먼저 구현하고,<br
 07. 📌 [프로젝트 회고](#-프로젝트-회고)
 08. 📌 [참고 자료](#️-참고-자료)
 
-<br>
+---
 
 ## 📐 Diagram
-<details><summary>ERD (Entity-Relationship Diagram)</summary>
-<br>
+<details>
+<summary>📊 ERD </summary>
 
-![ERD](/docs/images/ERD.png)
-
+![ERD](docs/images/ERD.png){width=80%}
 </details>
 
-<details><summary>UseCase</summary>
-<br>
+<details>
+<summary>🎮 Use Case</summary>
 
-![usecase](./docs/images/usecase.png)
-
+![UseCase](docs/images/usecase.png){width=80%}
 </details>
 
-<details><summary>Navigation</summary>
-<br>
+<details>
+<summary>🖥️Navigation</summary>
 
 ![navigation](./docs/images/navigation.png)
-
 </details>
 
-<br>
+---
 
 ## 🖥 UI 구현
-<details><summary>메인페이지</summary>
-<br>
+| **메인** |            **회원가입**             |              **로그인**              |           **마이페이지**            | **마이페이지**            |
+|:--------:|:-------------------------------:|:---------------------------------:|:------------------------------:|:------------------------------:|
+| ![main](docs/images/main.png) | ![signup](docs/images/signup.png) | ![login](docs/images/login.png) | ![mypage](docs/images/myPage.png) |![pay](docs/images/pay.png) |
 
-![mainpage](/docs/images/main.png)
+| **AI챗봇** | **대화목록** |               **대화리뷰**               |              **대화창**              |
+|:------------:|:---------:|:------------------------------------:|:---------------------------------:|
+| ![chat](docs/images/aichat_tech.png)| ![chatlist](docs/images/chatlist.png) | ![review-ai8](/docs/images/ai_8.png) | ![aichat](/docs/images/aichat_tech.png) |
 
-</details>
+|               **게시판**                |              **게시판 작성**               |
+|:------------------------------------:|:-------------------------------------:|
+| ![notice](/docs/images/notice.png) | ![noticeWrite](/docs/images/noticeWrite.png) |
 
-<details><summary>회원가입</summary>
-<br>
+---
 
-![signup](/docs/images/signup.png)
-
-</details>
-
-<details><summary>로그인</summary>
-<br>
-
-![login](/docs/images/login.png)
-
-</details>
-
-<details><summary>마이페이지</summary>
-<br>
-
-![mypage](/docs/images/myPage.png)
-
-</details>
-
-<details><summary>결제페이지</summary>
-<br>
-
-![pay](/docs/images/pay.png)
-
-</details>
-
-<details><summary>대화 목록</summary>
-<br>
-
-![chatlist](/docs/images/chatlist.png)
-
-</details>
-
-<details><summary>대화 리뷰</summary>
-<br>
-
-![review-ai8](/docs/images/ai_8.png)
-
-</details>
-
-<details><summary>AI 대화창</summary>
-<br>
-
-![aichat](/docs/images/aichat_tech.png)
-
-</details>
-
-<details><summary>게시판</summary>
-<br>
-
-![notice](/docs/images/notice.png)
-
-</details>
-
-<details><summary>게시판 작성</summary>
-<br>
-
-![noticeWrite](/docs/images/noticeWrite.png)
-
-</details>
-
-<br>
-
-## 🔎 주요 기능
+## 🔎 페이지별 주요 기능
 <details><summary>메인 페이지</summary>
 <br>
 
@@ -201,7 +146,7 @@ AI 채팅을 중심으로 한 기본 서비스 흐름을 먼저 구현하고,<br
 1. 사용자 닉네임을 반영한 개인화된 AI 가이드 제공<br>
 2. 기술/프로그래밍 질문에 특화된 대화 흐름 설계<br>
 3. 실시간 채팅 UI를 통한 연속 대화 지원<br>
-4. JWT 토큰 인증 기반 사용자 접근 제어
+4. 로컬스토리지 토큰 인증 기반 사용자 접근 제어
 </p>
 
 </details>
@@ -258,32 +203,34 @@ AI 채팅을 중심으로 한 기본 서비스 흐름을 먼저 구현하고,<br
 </p>
 </details>
 
-
+---
 
 ## 🎬 기능 실행화면
 
 <details>
 <summary>🔐 인증 & 계정 관리</summary><br>
-- 회원가입 / 로그인 (JWT 기반 인증)<br>
-- 마이페이지 정보 수정 및 멤버십 관리<br>
 
-![로그인&회원가입](./docs/video/login.gif) <br>
+![로그인&회원가입](./docs/video/회원가입,로그인.MP4)
+- 회원가입 / 로그인 (로컬스토리지 토큰기반 인증)
 
 ![마이페이지](./docs/video/mypage.gif)
+- 마이페이지 정보 수정 및 멤버십 관리
 </details>
 
 
 
 <details>
 <summary>🤖 AI 플랫폼 대화</summary>
-- 역할별 AI 비서와 실시간 대화 <br>
-- 사용 제한 및 예외 상황 처리<br>
 
-![AI챗봇대화실행](./docs/video/mypage.gif)<br>
-※ 예외처리 시나리오 <br>
+![AI챗봇대화실행](./docs/video/ChatbotAnswer.gif)<br>
+- 역할별 AI 비서와 실시간 대화
+- 사용 제한 및 예외 상황 처리
 
-![챗봇답변거절멘트](./docs/video/mypage.gif) <br>
-![사용횟수초과시처리](./docs/video/mypage.gif)
+![챗봇답변거절멘트](./docs/video/ChatbotDis.gif)
+- 예외처리 시나리오
+
+![사용횟수초과시처리](./docs/video/ChatbotOVer.gif)
+- 사용횟수 초과 시나리오
 </details>
 
 
@@ -291,7 +238,7 @@ AI 채팅을 중심으로 한 기본 서비스 흐름을 먼저 구현하고,<br
 <details>
 <summary>📂 대화 기록 관리</summary><br>
 
-![이전대화목록확인](./videos/이전%20대화목록%20확인.mp4)<br>
+![이전대화목록확인](./videos/이전%20대화목록%20확인.mp4)
 - 이전 AI 대화 목록 조회 <br>
 - 대화 선택 기반 화면 전환
 </details>
@@ -302,7 +249,6 @@ AI 채팅을 중심으로 한 기본 서비스 흐름을 먼저 구현하고,<br
 <summary>💳 결제 & 멤버십</summary><br>
 
 ![결제페이지](./docs/video/pay.gif)
-<br>
 - 코인 충전 및 결제 수단 선택 <br>
 - 결제 결과에 따른 잔액 반영
 </details>
@@ -312,16 +258,31 @@ AI 채팅을 중심으로 한 기본 서비스 흐름을 먼저 구현하고,<br
 <details>
 <summary>🎥 게시판 & 리뷰</summary><br>
 
-![게시판페이지](./docs/video/NoticeWrite.gif)
+![게시판페이지1](./docs/video/NoticeWrite.gif)
+- 게시판작성
+
+![게시판페이지2](./docs/video/NoticeDetail.gif)
+- 게시판디테일
+
+![게시판페이지3](./docs/video/NoticeDelect.gif)
+- 게시판삭제
+
+![게시판페이지](./docs/video/Review.gif)
+- 챗봇 사용리뷰작성
 </details>
 
+---
 
+## 📂 프로젝트 일별 보고서(Notion)
 
-<br>
+<div>
 
-## 📂 프로젝트 보고서
+[![노션 문서](./docs/images/노션.png)](https://www.notion.so/mathmatics-of-girrafe/AI-X-2c3db6eabe8680f889bdffc25a128afd)
+> 노션에서 전체 프로젝트 문서 확인하기 👆 클릭!
 
-<br>
+</div>
+
+---
 
 
 ## 🚧 향후 개선 및 추가 기능
