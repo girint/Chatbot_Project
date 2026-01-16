@@ -258,56 +258,56 @@ AI 채팅을 중심으로 한 기본 서비스 흐름을 먼저 구현하고,<br
 </p>
 </details>
 
+
+
 ## 🎬 기능 실행화면
-<details><summary>🔐 인증 & 계정 관리</summary>
-- 회원가입 / 로그인 (JWT 기반 인증)<br>
-- 마이페이지 정보 수정 및 멤버십 관리
-
-[로그인&회원가입](./videos/회원가입,로그인.mp4) <br>
-[마이페이지](./videos/마이페이지%20구현.mp4)
-
-</details>
-
-<details><summary>🤖 AI 플랫폼 대화</summary>
-- 역할별 AI 비서와 실시간 대화 <br>
-- 사용 제한 및 예외 상황 처리
-
-[AI챗봇대화실행](./videos/챗봇%20답변.mp4)
-
-※ 예외처리 시나리오 <br>
-[챗봇답변거절멘트](./videos/챗봇%20답변%20거절멘트.mp4) <br>
-[사용횟수초과시처리](./videos/챗봇%20사용횟수%20초과시.mp4)
-
-</details>
-
-<details><summary>📂 대화 기록 관리</summary>
-- 이전 AI 대화 목록 조회 <br>
-- 대화 선택 기반 화면 전환
-
-[이전대화목록확인](./videos/이전%20대화목록%20확인.mp4)
-
-</details>
 
 <details>
-<summary>💳 결제 & 멤버십</summary>
-<br>
+<summary>🔐 인증 & 계정 관리</summary><br>
+- 회원가입 / 로그인 (JWT 기반 인증)<br>
+- 마이페이지 정보 수정 및 멤버십 관리<br>
+![로그인&회원가입](./docs/video/login.gif) <br>
+![마이페이지](./docs/video/mypage.gif)
+</details>
 
-![서브페이지](./docs/video/pay.gif)
 
-<br>
+
+<details>
+<summary>🤖 AI 플랫폼 대화</summary>
+- 역할별 AI 비서와 실시간 대화 <br>
+- 사용 제한 및 예외 상황 처리<br>
+![AI챗봇대화실행](./docs/video/mypage.gif)<br>
+※ 예외처리 시나리오 <br>
+![챗봇답변거절멘트](./docs/video/mypage.gif) <br>
+![사용횟수초과시처리](./docs/video/mypage.gif)
+</details>
+
+
+
+<details>
+<summary>📂 대화 기록 관리</summary><br>
+![이전대화목록확인](./videos/이전%20대화목록%20확인.mp4)<br>
+- 이전 AI 대화 목록 조회 <br>
+- 대화 선택 기반 화면 전환
+</details>
+
+
+
+<details>
+<summary>💳 결제 & 멤버십</summary><br>
+![결제페이지](./docs/video/pay.gif)<br>
 - 코인 충전 및 결제 수단 선택 <br>
 - 결제 결과에 따른 잔액 반영
 </details>
 
 
 
-
-<details><summary>🎥 게시판 & 리뷰</summary>
-
-[게시글 작성.mp4](./docs/video/NoticeWrite.gif)
-
-
+<details>
+<summary>🎥 게시판 & 리뷰</summary><br>
+![게시판페이지](./docs/video/NoticeWrite.gif)
 </details>
+
+
 
 <br>
 
