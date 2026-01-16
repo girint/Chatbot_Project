@@ -289,22 +289,18 @@ AI 채팅을 중심으로 한 기본 서비스 흐름을 먼저 구현하고,<br
 </details>
 
 <details>
-<summary>서브페이지</summary>
+<summary>💳 결제 & 멤버십</summary>
 <br>
 
 ![서브페이지](./docs/video/pay.gif)
-</details>
 
-
-
-
-<details><summary>💳 결제 & 멤버십</summary>
+<br>
 - 코인 충전 및 결제 수단 선택 <br>
 - 결제 결과에 따른 잔액 반영
-
-![결제페이지실행](.docs/video/pay.gif)
-
 </details>
+
+
+
 
 <details><summary>🎥 게시판 & 리뷰</summary>
 
