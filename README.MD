@@ -266,7 +266,9 @@ AI 채팅을 중심으로 한 기본 서비스 흐름을 먼저 구현하고,<br
 <summary>🔐 인증 & 계정 관리</summary><br>
 - 회원가입 / 로그인 (JWT 기반 인증)<br>
 - 마이페이지 정보 수정 및 멤버십 관리<br>
+
 ![로그인&회원가입](./docs/video/login.gif) <br>
+
 ![마이페이지](./docs/video/mypage.gif)
 </details>
 
@@ -276,8 +278,10 @@ AI 채팅을 중심으로 한 기본 서비스 흐름을 먼저 구현하고,<br
 <summary>🤖 AI 플랫폼 대화</summary>
 - 역할별 AI 비서와 실시간 대화 <br>
 - 사용 제한 및 예외 상황 처리<br>
+
 ![AI챗봇대화실행](./docs/video/mypage.gif)<br>
 ※ 예외처리 시나리오 <br>
+
 ![챗봇답변거절멘트](./docs/video/mypage.gif) <br>
 ![사용횟수초과시처리](./docs/video/mypage.gif)
 </details>
@@ -286,6 +290,7 @@ AI 채팅을 중심으로 한 기본 서비스 흐름을 먼저 구현하고,<br
 
 <details>
 <summary>📂 대화 기록 관리</summary><br>
+
 ![이전대화목록확인](./videos/이전%20대화목록%20확인.mp4)<br>
 - 이전 AI 대화 목록 조회 <br>
 - 대화 선택 기반 화면 전환
@@ -294,8 +299,7 @@ AI 채팅을 중심으로 한 기본 서비스 흐름을 먼저 구현하고,<br
 
 
 <details>
-<summary>💳 결제 & 멤버십</summary>
-<br>
+<summary>💳 결제 & 멤버십</summary><br>
 
 ![결제페이지](./docs/video/pay.gif)
 <br>
@@ -306,8 +310,7 @@ AI 채팅을 중심으로 한 기본 서비스 흐름을 먼저 구현하고,<br
 
 
 <details>
-<summary>🎥 게시판 & 리뷰</summary>
-<br>
+<summary>🎥 게시판 & 리뷰</summary><br>
 
 ![게시판페이지](./docs/video/NoticeWrite.gif)
 </details>
